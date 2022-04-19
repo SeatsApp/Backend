@@ -8,6 +8,10 @@ plugins {
 
 	id 'java'
 
+	//pmd
+	id 'pmd'
+
+	//checkstyle
 	id 'checkstyle'
 }
 
@@ -43,6 +47,12 @@ sonarqube {
 		property "sonar.organization", "seatsapp"
 		property "sonar.host.url", "https://sonarcloud.io"
 	}
+}
+
+//pmd
+pmd {
+	ruleSetConfig = rootProject.resources.text.fromFile('config/ruleset.xml')
+	ignoreFailures = false
 }
 
 // CheckStyle
