@@ -1,6 +1,11 @@
 plugins {
+	// Spring
 	id 'org.springframework.boot' version '2.6.6'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+
+	// Sonarcloud
+	id "org.sonarqube" version "3.3"
+
 	id 'java'
 }
 
@@ -18,6 +23,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// Sonarcloud
+sonarqube {
+	properties {
+		property "sonar.projectKey", "SeatsApp_Backend"
+		property "sonar.organization", "seatsapp"
+		property "sonar.host.url", "https://sonarcloud.io"
+	}
 }
 
 tasks.named('test') {
