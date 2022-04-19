@@ -38,6 +38,13 @@ dependencies {
 
 	testCompileOnly 'org.projectlombok:lombok:1.18.24'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+	//H2
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'com.h2database:h2'
+	implementation 'org.hibernate.validator:hibernate-validator:7.0.4.Final'
 }
 
 // Sonarcloud
@@ -52,6 +59,7 @@ sonarqube {
 //pmd
 pmd {
 	ruleSetConfig = rootProject.resources.text.fromFile('config/ruleset.xml')
+	ruleSets = []
 	ignoreFailures = false
 }
 
@@ -59,7 +67,6 @@ pmd {
 checkstyle {
 	configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
 	configProperties = [samedir: "${rootDir}"]
-
 }
 
 tasks.named('test') {
