@@ -6,6 +6,8 @@ import com.seatapp.repositories.SeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SeatService {
     /**
@@ -35,5 +37,13 @@ public class SeatService {
             throw new IllegalArgumentException("The seat name is invalid.");
         }
         return seatRepository.save(new Seat(seatDto.getName()));
+    }
+
+    /**
+     * Gets all the seats from database.
+     * @return a list of seats
+     */
+    public List<Seat> getAll() {
+        return seatRepository.findAll();
     }
 }
