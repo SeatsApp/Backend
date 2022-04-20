@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * This is an api to create, read and delete seats.
@@ -43,5 +45,18 @@ public class SeatsController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Seat with name: \"" + createdSeat.getName()
                         + "\" is successfully created.");
+    }
+
+    /**
+     * Deletes a seat with a certain id.
+     * @param seatId the id of the to be deleted seat.
+     * @return Returns a responseEntity with the HttpStatus and a message.
+     */
+    @DeleteMapping("/seats/{seatId}")
+    public ResponseEntity<String> deleteSeat(
+            @PathVariable final Long seatId) {
+        Seat deletedSeat = seatService.delete(seatId);
+        return ResponseEntity.ok("Seat with id: " + deletedSeat.getId()
+                + " is successfully removed.");
     }
 }

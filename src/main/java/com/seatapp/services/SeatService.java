@@ -6,6 +6,8 @@ import com.seatapp.repositories.SeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 public class SeatService {
     /**
@@ -35,5 +37,18 @@ public class SeatService {
             throw new IllegalArgumentException("The seat name is invalid.");
         }
         return seatRepository.save(new Seat(seatDto.getName()));
+    }
+
+    /**
+     * Deletes the seat with the specified id.
+     * @param seatId the id of the to be deleted seat.
+     * @return the deleted seat.
+     */
+    public Seat delete(final Long seatId) {
+        Seat seat = seatRepository.findById(seatId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("No seat with this id."));
+        seatRepository.delete(seat);
+        return seat;
     }
 }

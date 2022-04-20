@@ -2,6 +2,8 @@ package com.seatapp.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatapp.controllers.dtos.SeatDto;
+import com.seatapp.domain.Seat;
+import com.seatapp.repositories.SeatRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.transaction.Transactional;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -21,6 +27,12 @@ class SeatControllerTest {
      */
     @Autowired
     private MockMvc mockMvc;
+
+    /**
+     * Represents the seat repository.
+     */
+    @Autowired
+    private SeatRepository seatRepository;
 
     /**
      * Represents objectMapper for json conversions.
@@ -42,6 +54,7 @@ class SeatControllerTest {
     }
 
     @Test
+    @Transactional
     void createSeat() throws Exception {
         SeatDto seatDto = new SeatDto("Test");
 
@@ -90,4 +103,26 @@ class SeatControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @Transactional
+    void deleteSeatWithValidId() throws Exception {
+        Seat toBeDeletedSeat = seatRepository.save(new Seat("TestSeat"));
+
+        mockMvc.perform(delete("/api/seats/" + toBeDeletedSeat.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .string("Seat with id: " + toBeDeletedSeat.getId()
+                                + " is successfully removed."));
+    }
+
+    @Test
+    @Transactional
+    void deleteSeatWithInValidId() throws Exception {
+        mockMvc.perform(delete("/api/seats/1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content()
+                        .string("No seat with this id."));
+    }
+
 }
