@@ -5,6 +5,9 @@ plugins {
 
 	// Sonarcloud
 	id "org.sonarqube" version "3.3"
+	
+	// Jacoco for sending code coverage to Sonarcloud
+	id 'jacoco'
 
 	id 'java'
 
@@ -53,7 +56,23 @@ sonarqube {
 		property "sonar.projectKey", "SeatsApp_Backend"
 		property "sonar.organization", "seatsapp"
 		property "sonar.host.url", "https://sonarcloud.io"
+		property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
 	}
+}
+
+jacoco {
+	toolVersion = "0.8.8"
+}
+
+// Jacoco for sending code coverage to sonarcloud
+jacocoTestReport {
+	reports {
+		xml.enabled true
+	}
+}
+test.finalizedBy jacocoTestReport
+tasks.named('sonarqube').configure {
+	dependsOn test
 }
 
 //pmd
