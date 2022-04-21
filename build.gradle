@@ -5,6 +5,9 @@ plugins {
 
 	// Sonarcloud
 	id "org.sonarqube" version "3.3"
+	
+	// Jacoco for sending code coverage to Sonarcloud
+	id 'jacoco'
 
 	id 'java'
 
@@ -29,20 +32,20 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	//Checkstyle
+	// Checkstyle
 	implementation 'com.puppycrawl.tools:checkstyle:10.1'
 
-	//Lombok
+	// Lombok
 	compileOnly 'org.projectlombok:lombok:1.18.24'
 	annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
 	testCompileOnly 'org.projectlombok:lombok:1.18.24'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-	//H2
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// H2 Database
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'com.h2database:h2'
 	implementation 'org.hibernate.validator:hibernate-validator:7.0.4.Final'
 }
@@ -53,7 +56,23 @@ sonarqube {
 		property "sonar.projectKey", "SeatsApp_Backend"
 		property "sonar.organization", "seatsapp"
 		property "sonar.host.url", "https://sonarcloud.io"
+		property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
 	}
+}
+
+jacoco {
+	toolVersion = "0.8.8"
+}
+
+// Jacoco for sending code coverage to sonarcloud
+jacocoTestReport {
+	reports {
+		xml.enabled true
+	}
+}
+test.finalizedBy jacocoTestReport
+tasks.named('sonarqube').configure {
+	dependsOn test
 }
 
 //pmd
