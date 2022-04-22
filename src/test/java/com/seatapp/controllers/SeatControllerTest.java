@@ -2,6 +2,8 @@ package com.seatapp.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatapp.controllers.dtos.SeatDto;
+import com.seatapp.domain.Seat;
+import com.seatapp.repositories.SeatRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.transaction.Transactional;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -21,6 +27,12 @@ class SeatControllerTest {
      */
     @Autowired
     private MockMvc mockMvc;
+
+    /**
+     * Represents the seat repo.
+     */
+    @Autowired
+    private SeatRepository seatRepository;
 
     /**
      * Represents objectMapper for json conversions.
@@ -42,6 +54,7 @@ class SeatControllerTest {
     }
 
     @Test
+    @Transactional
     void createSeat() throws Exception {
         SeatDto seatDto = new SeatDto("Test");
 
@@ -89,5 +102,29 @@ class SeatControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    void getSeats() throws Exception {
+        Seat seat1 = seatRepository.save(new Seat("Test1"));
+        Seat seat2 = seatRepository.save(new Seat("Test2"));
+
+        mockMvc.perform(get("/api/seats"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .json("[{\"id\": " + seat1.getId()
+                                + ", \"name\": \"Test1\"},"
+                                + "{\"id\": " + seat2.getId()
+                                + ", \"name\": \"Test2\"}]"));
+    }
+
+    @Test
+    @Transactional
+    void getSeatsWithEmptyDatabase() throws Exception {
+                mockMvc.perform(get("/api/seats"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .json("[]"));
     }
 }

@@ -6,10 +6,13 @@ import com.seatapp.services.SeatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 /**
  * This is an api to create, read and delete seats.
@@ -43,5 +46,15 @@ public class SeatsController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Seat with name: \"" + createdSeat.getName()
                         + "\" is successfully created.");
+    }
+
+    /**
+     * Takes all the seats from the database.
+     * @return Returns a responseEntity with the HttpStatus and the found seats.
+     */
+    @GetMapping("/seats")
+    public ResponseEntity<List<Seat>> getSeats() {
+        List<Seat> foundSeats = seatService.getAll();
+        return ResponseEntity.ok(foundSeats);
     }
 }

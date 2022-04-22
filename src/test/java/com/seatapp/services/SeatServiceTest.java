@@ -10,9 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 class SeatServiceTest {
@@ -50,13 +55,44 @@ class SeatServiceTest {
     @Test
     void createSeatTestWithNull() {
         Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> {
-            seatService.createSeat(null);
-        });
+                () -> seatService.createSeat(null));
 
         String expectedMessage = "SeatDto cannot be null";
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
     }
+
+    @Test
+    void getSeatsWillReturnSeats() {
+        //given
+        Seat seat1 = new Seat("Test");
+        seat1.setId(1L);
+
+        Seat seat2 = new Seat("Test2");
+        seat2.setId(2L);
+
+        given(seatRepository.findAll()).willReturn(List.of(seat1, seat2));
+
+        //act
+        List<Seat> seats = seatService.getAll();
+
+        //assert
+        assertFalse(seats.isEmpty());
+        assertEquals(2, seats.size());
+    }
+
+    @Test
+    void getSeatsWillReturnEmptyListWhileNoSeatsInDatabase() {
+        //given
+        given(seatRepository.findAll()).willReturn(List.of());
+
+        //act
+        List<Seat> seats = seatService.getAll();
+
+        //assert
+        assertNotNull(seats);
+        assertTrue(seats.isEmpty());
+    }
+
 }
