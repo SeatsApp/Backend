@@ -10,14 +10,14 @@
 # idea folder
 .idea/
 
-# gradle folder
-.gradle/
-
-# build folder
-build/
-
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
+
+#build folder
+build/
+
+#gradle folder
+.gradle/
 
 # Package Files #
 *.jar
