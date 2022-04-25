@@ -11,10 +11,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import javax.transaction.Transactional;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -124,5 +123,28 @@ class SeatControllerTest {
                 .andExpect(content()
                         .string("No seat with this id."));
     }
+  
+    @Test
+    @Transactional
+    void getSeats() throws Exception {
+        Seat seat1 = seatRepository.save(new Seat("Test1"));
+        Seat seat2 = seatRepository.save(new Seat("Test2"));
 
+        mockMvc.perform(get("/api/seats"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .json("[{\"id\": " + seat1.getId()
+                                + ", \"name\": \"Test1\"},"
+                                + "{\"id\": " + seat2.getId()
+                                + ", \"name\": \"Test2\"}]"));
+    }
+  
+    @Test
+    @Transactional
+    void getSeatsWithEmptyDatabase() throws Exception {
+                mockMvc.perform(get("/api/seats"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .json("[]"));
+    }
 }
