@@ -93,7 +93,7 @@ class SeatServiceTest {
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
-    @Test  
+    @Test
     void getSeatsWillReturnSeats() {
         //given
         Seat seat1 = new Seat("Test");

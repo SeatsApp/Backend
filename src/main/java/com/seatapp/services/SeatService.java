@@ -51,7 +51,7 @@ public class SeatService {
         seatRepository.delete(seat);
         return seat;
     }
-  
+
      /**
      * Gets all the seats from database.
      * @return a list of seats

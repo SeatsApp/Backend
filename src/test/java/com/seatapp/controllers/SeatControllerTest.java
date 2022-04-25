@@ -123,7 +123,7 @@ class SeatControllerTest {
                 .andExpect(content()
                         .string("No seat with this id."));
     }
-  
+
     @Test
     @Transactional
     void getSeats() throws Exception {
@@ -138,7 +138,7 @@ class SeatControllerTest {
                                 + "{\"id\": " + seat2.getId()
                                 + ", \"name\": \"Test2\"}]"));
     }
-  
+
     @Test
     @Transactional
     void getSeatsWithEmptyDatabase() throws Exception {
