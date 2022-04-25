@@ -29,6 +29,10 @@ public class Seat {
      */
     @NotBlank
     private String name;
+    /**
+     * Represents the reservation status of a seat.
+     */
+    private boolean isReserved;
 
     /**
      * Creates a seat with a specified name.
@@ -36,5 +40,6 @@ public class Seat {
      */
     public Seat(final String name) {
         this.name = name;
+        this.isReserved = false;
     }
 }

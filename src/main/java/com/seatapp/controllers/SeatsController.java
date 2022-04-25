@@ -6,18 +6,22 @@ import com.seatapp.services.SeatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import java.util.List;
 
 /**
  * This is an api to create, read and delete seats.
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/")
 public class SeatsController {
@@ -70,5 +74,18 @@ public class SeatsController {
     public ResponseEntity<List<Seat>> getSeats() {
         List<Seat> foundSeats = seatService.getAll();
         return ResponseEntity.ok(foundSeats);
+    }
+
+    /**
+     * Reserves an existing seat.
+     * @param seatId the Id of the to be reserved seat.
+     * @return Returns a response with the HttpStatus and a message.
+     */
+    @PatchMapping("/seats/{seatId}/reserve")
+    public ResponseEntity<String> reserveSeat(@PathVariable
+                                                  final Long seatId) {
+        Seat reservedSeat = seatService.reserve(seatId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("You reserved " + reservedSeat.getName() + ".");
     }
 }

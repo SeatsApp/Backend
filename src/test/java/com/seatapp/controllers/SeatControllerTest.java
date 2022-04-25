@@ -12,9 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import javax.transaction.Transactional;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -146,5 +148,40 @@ class SeatControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .json("[]"));
+    }
+
+    @Test
+    @Transactional
+    void reserveSeatWithValidId() throws Exception {
+        Seat toBeReservedSeat = seatRepository.save(new Seat("TestSeat"));
+
+        mockMvc.perform(patch("/api/seats/" + toBeReservedSeat.getId()
+                        + "/reserve"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .string("You reserved "
+                                + toBeReservedSeat.getName() + "."));
+    }
+
+    @Test
+    @Transactional
+    void reserveSeatWithNoValidId() throws Exception {
+        mockMvc.perform(patch("/api/seats/1/reserve"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content()
+                        .string("No seat with this id."));
+    }
+
+    @Test
+    @Transactional
+    void reserveSeatThatIsReserved() throws Exception {
+        Seat toBeReservedSeat = seatRepository.save(new Seat(1L,
+                "TestSeat", true));
+
+        mockMvc.perform(patch("/api/seats/" + toBeReservedSeat.getId()
+                        + "/reserve"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content()
+                        .string("Seat is already reserved."));
     }
 }
