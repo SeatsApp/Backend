@@ -11,9 +11,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import javax.transaction.Transactional;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -29,7 +28,7 @@ class SeatControllerTest {
     private MockMvc mockMvc;
 
     /**
-     * Represents the seat repo.
+     * Represents the seat repository.
      */
     @Autowired
     private SeatRepository seatRepository;
@@ -102,6 +101,27 @@ class SeatControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    void deleteSeatWithValidId() throws Exception {
+        Seat toBeDeletedSeat = seatRepository.save(new Seat("TestSeat"));
+
+        mockMvc.perform(delete("/api/seats/" + toBeDeletedSeat.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .string("Seat with id: " + toBeDeletedSeat.getId()
+                                + " is successfully removed."));
+    }
+
+    @Test
+    @Transactional
+    void deleteSeatWithInValidId() throws Exception {
+        mockMvc.perform(delete("/api/seats/1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content()
+                        .string("No seat with this id."));
     }
 
     @Test

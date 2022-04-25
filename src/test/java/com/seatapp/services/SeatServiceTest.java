@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,6 +64,36 @@ class SeatServiceTest {
     }
 
     @Test
+    void deleteSeatWithValidId() {
+        Seat toBeDeletedSeat = new Seat("TestSeat");
+        toBeDeletedSeat.setId(1L);
+
+        //Given
+        Mockito.when(seatRepository.findById(toBeDeletedSeat.getId()))
+                .thenReturn(java.util.Optional.of(toBeDeletedSeat));
+
+        //Act
+        Seat deletedSeat = seatService.delete(toBeDeletedSeat.getId());
+
+        //Assert
+        assertEquals(toBeDeletedSeat.getId(), deletedSeat.getId());
+        assertEquals(toBeDeletedSeat.getName(), deletedSeat.getName());
+    }
+
+    @Test
+    void deleteSeatWithNoValidId() {
+        Exception exception = assertThrows(EntityNotFoundException.class,
+                () -> {
+                    seatService.delete(1L);
+                });
+
+        String expectedMessage = "No seat with this id.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void getSeatsWillReturnSeats() {
         //given
         Seat seat1 = new Seat("Test");
@@ -94,5 +124,4 @@ class SeatServiceTest {
         assertNotNull(seats);
         assertTrue(seats.isEmpty());
     }
-
 }
