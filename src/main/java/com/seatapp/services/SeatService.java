@@ -59,4 +59,21 @@ public class SeatService {
     public List<Seat> getAll() {
         return seatRepository.findAll();
     }
+
+    /**
+     * Reserves the seat with the specified id.
+     * @param seatId is the id of the to be reserved seat.
+     * @return the reserved seat.
+     */
+    public Seat reserve(final Long seatId) {
+        Seat seat = seatRepository.findById(seatId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("No seat with this id."));
+        if (seat.isReserved()) {
+            throw new IllegalArgumentException("Seat is already reserved.");
+        }
+        seat.setReserved(true);
+        seatRepository.save(seat);
+        return seat;
+    }
 }

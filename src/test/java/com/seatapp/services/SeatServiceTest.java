@@ -47,7 +47,7 @@ class SeatServiceTest {
         Seat savedSeat = seatService.createSeat(new SeatDto("Test"));
 
         //Assert
-        Seat expectedSeat = new Seat(1L, "Test");
+        Seat expectedSeat = new Seat(1L, "Test", false);
         assertEquals(expectedSeat.getId(), savedSeat.getId());
         assertEquals(expectedSeat.getName(), savedSeat.getName());
     }
@@ -123,5 +123,60 @@ class SeatServiceTest {
         //assert
         assertNotNull(seats);
         assertTrue(seats.isEmpty());
+    }
+
+    @Test
+    void reserveSeatWithValidId() {
+        //Given
+        Seat toBeReservedSeat = new Seat("ReservedSeat");
+        toBeReservedSeat.setId(1L);
+
+        Mockito.when(seatRepository.save(Mockito.any(Seat.class)))
+                .thenAnswer(i -> {
+                    Seat seat = i.getArgument(0);
+                    seat.setId(1L);
+                    return seat;
+                });
+
+        Mockito.when(seatRepository.findById(toBeReservedSeat.getId()))
+                .thenReturn(java.util.Optional.of(toBeReservedSeat));
+
+        //Act
+        Seat reservedSeat = seatService.reserve(toBeReservedSeat.getId());
+
+        //Assert
+        assertEquals(toBeReservedSeat.getId(), reservedSeat.getId());
+        assertEquals(toBeReservedSeat.getName(), reservedSeat.getName());
+    }
+
+    @Test
+    void reserveSeatWithNoValidId() {
+        Exception exception = assertThrows(EntityNotFoundException.class,
+                () -> {
+                    seatService.reserve(1L);
+                });
+
+        String expectedMessage = "No seat with this id.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void reserveSeatWithThatIsAlreadyReserved() {
+        Seat toBeReservedSeat = new Seat(1L, "ReservedSeat", true);
+
+        Mockito.when(seatRepository.findById(toBeReservedSeat.getId()))
+                .thenReturn(java.util.Optional.of(toBeReservedSeat));
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> {
+                    seatService.reserve(1L);
+                });
+
+        String expectedMessage = "Seat is already reserved.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 }
