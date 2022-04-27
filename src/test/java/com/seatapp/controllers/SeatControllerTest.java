@@ -1,7 +1,9 @@
 package com.seatapp.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
+import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Seat;
 import com.seatapp.repositories.SeatRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,18 +13,44 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 class SeatControllerTest {
+    /**
+     * The year used in the tests.
+     */
+    private static final int DATE_YEAR = 2022;
+    /**
+     * The month used in tests.
+     */
+    private static final int DATE_MONTH = 4;
+    /**
+     * The day used in tests.
+     */
+    private static final int DATE_DAY = 27;
+    /**
+     * An hour used in the tests.
+     */
+    private static final int DATE_HOUR_13 = 13;
+    /**
+     * An hour used in the tests.
+     */
+    private static final int DATE_HOUR_17 = 17;
+    /**
+     * An hour used in the tests.
+     */
+    private static final int DATE_HOUR_14 = 14;
     /**
      * Represents mockMvc.
      */
@@ -45,6 +73,10 @@ class SeatControllerTest {
      * Represents api url for createSeat.
      */
     private String createSeatUrl;
+    /**
+     * Represents api url for /api/seats/.
+     */
+    private String apiSeatsUrl;
 
     /**
      * This method sets up necessary items for the tests.
@@ -52,6 +84,7 @@ class SeatControllerTest {
     @BeforeEach
     void setup() {
         createSeatUrl = "/api/seat";
+        apiSeatsUrl = "/api/seats/";
     }
 
     @Test
@@ -68,7 +101,7 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithNoName() throws Exception {
-             mockMvc.perform(post(createSeatUrl)
+        mockMvc.perform(post(createSeatUrl)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -110,7 +143,7 @@ class SeatControllerTest {
     void deleteSeatWithValidId() throws Exception {
         Seat toBeDeletedSeat = seatRepository.save(new Seat("TestSeat"));
 
-        mockMvc.perform(delete("/api/seats/" + toBeDeletedSeat.getId()))
+        mockMvc.perform(delete(apiSeatsUrl + toBeDeletedSeat.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .string("Seat with id: " + toBeDeletedSeat.getId()
@@ -144,7 +177,7 @@ class SeatControllerTest {
     @Test
     @Transactional
     void getSeatsWithEmptyDatabase() throws Exception {
-                mockMvc.perform(get("/api/seats"))
+        mockMvc.perform(get("/api/seats"))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .json("[]"));
@@ -153,10 +186,21 @@ class SeatControllerTest {
     @Test
     @Transactional
     void reserveSeatWithValidId() throws Exception {
+        LocalDateTime startTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_13, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_17, 0, 0);
+
+        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
+
         Seat toBeReservedSeat = seatRepository.save(new Seat("TestSeat"));
 
-        mockMvc.perform(patch("/api/seats/" + toBeReservedSeat.getId()
-                        + "/reserve"))
+        mockMvc.perform(patch(apiSeatsUrl + toBeReservedSeat.getId()
+                        + "/reserve")
+                        .content(objectMapper
+                                .writeValueAsString(reservationDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .string("You reserved "
@@ -166,7 +210,18 @@ class SeatControllerTest {
     @Test
     @Transactional
     void reserveSeatWithNoValidId() throws Exception {
-        mockMvc.perform(patch("/api/seats/1/reserve"))
+        LocalDateTime startTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_13, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_17, 0, 0);
+
+        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
+
+        mockMvc.perform(patch("/api/seats/1/reserve")
+                        .content(objectMapper
+                                .writeValueAsString(reservationDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content()
                         .string("No seat with this id."));
@@ -174,14 +229,96 @@ class SeatControllerTest {
 
     @Test
     @Transactional
-    void reserveSeatThatIsReserved() throws Exception {
-        Seat toBeReservedSeat = seatRepository.save(new Seat(1L,
-                "TestSeat", true));
+    void reserveSeatThatIsReservedCase1() throws Exception {
+        LocalDateTime startTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_13, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_17, 0, 0);
 
-        mockMvc.perform(patch("/api/seats/" + toBeReservedSeat.getId()
-                        + "/reserve"))
+        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
+
+        Seat toBeReservedSeat = new Seat(
+                "TestSeat");
+
+        toBeReservedSeat.getReservations()
+                .add(new Reservation(startTime, endTime));
+
+        Seat savedSeat = seatRepository.save(toBeReservedSeat);
+
+        mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
+                        + "/reserve").content(objectMapper
+                                .writeValueAsString(reservationDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content()
-                        .string("Seat is already reserved."));
+                        .string("Timeslot already booked."));
     }
+
+    @Test
+    @Transactional
+    void reserveSeatThatIsReservedCase2() throws Exception {
+        LocalDateTime startTimeExisting = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_13, 0, 0);
+        LocalDateTime endTimeExisting = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
+        LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_14, 0, 0);
+        LocalDateTime endTimeNew = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
+
+        ReservationDto reservationDto =
+                new ReservationDto(startTimeNew, endTimeNew);
+
+        Seat toBeReservedSeat = new Seat(
+                "Seat");
+
+        toBeReservedSeat.getReservations()
+                .add(new Reservation(startTimeExisting, endTimeExisting));
+
+        Seat savedSeat = seatRepository.save(toBeReservedSeat);
+
+        mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
+                        + "/reserve").content(objectMapper
+                                .writeValueAsString(reservationDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content()
+                        .string("Timeslot already booked."));
+    }
+
+    @Test
+    @Transactional
+    void reserveSeatThatIsReservedCase3() throws Exception {
+        LocalDateTime startTimeExisting = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_14, 0, 0);
+        LocalDateTime endTimeExisting = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_17, 0, 0);
+        LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_13, 0, 0);
+        LocalDateTime endTimeNew = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_17, 0, 0);
+
+        ReservationDto reservationDto =
+                new ReservationDto(startTimeNew, endTimeNew);
+
+        Seat toBeReservedSeat = new Seat(
+                "Seat");
+
+        toBeReservedSeat.getReservations()
+                .add(new Reservation(startTimeExisting, endTimeExisting));
+
+        Seat savedSeat = seatRepository.save(toBeReservedSeat);
+
+        mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
+                        + "/reserve").content(objectMapper
+                                .writeValueAsString(reservationDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content()
+                        .string("Timeslot already booked."));
+    }
+
 }
