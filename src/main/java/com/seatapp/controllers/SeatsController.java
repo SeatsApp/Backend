@@ -1,5 +1,6 @@
 package com.seatapp.controllers;
 
+import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
 import com.seatapp.domain.Seat;
 import com.seatapp.services.SeatService;
@@ -79,12 +80,15 @@ public class SeatsController {
     /**
      * Reserves an existing seat.
      * @param seatId the Id of the to be reserved seat.
+     * @param reservationDto the reservation details.
      * @return Returns a response with the HttpStatus and a message.
      */
     @PatchMapping("/seats/{seatId}/reserve")
     public ResponseEntity<String> reserveSeat(@PathVariable
-                                                  final Long seatId) {
-        Seat reservedSeat = seatService.reserve(seatId);
+                                                  final Long seatId,
+                                              @RequestBody final
+                                              ReservationDto reservationDto) {
+        Seat reservedSeat = seatService.reserve(seatId, reservationDto);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("You reserved " + reservedSeat.getName() + ".");
     }

@@ -1,10 +1,13 @@
 package com.seatapp.services;
 
+import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
+import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Seat;
 import com.seatapp.repositories.SeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
@@ -17,6 +20,7 @@ public class SeatService {
 
     /**
      * Creates a service with the specified repository.
+     *
      * @param seatRepository The seat repository.
      */
     @Autowired
@@ -26,6 +30,7 @@ public class SeatService {
 
     /**
      * Saves a seat to the database.
+     *
      * @param seatDto The seatDto containing the name.
      * @return The saved seat.
      */
@@ -39,20 +44,19 @@ public class SeatService {
         return seatRepository.save(new Seat(seatDto.getName()));
     }
 
-     /**
+    /**
      * Deletes the seat with the specified id.
+     *
      * @param seatId the id of the to be deleted seat.
      * @return the deleted seat.
      */
     public Seat delete(final Long seatId) {
-        Seat seat = seatRepository.findById(seatId)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("No seat with this id."));
+        Seat seat = getSeatById(seatId);
         seatRepository.delete(seat);
         return seat;
     }
 
-     /**
+    /**
      * Gets all the seats from database.
      * @return a list of seats
      */
@@ -61,18 +65,31 @@ public class SeatService {
     }
 
     /**
-     * Reserves the seat with the specified id.
-     * @param seatId is the id of the to be reserved seat.
-     * @return the reserved seat.
+     * Gets a seat from database with the given id.
+     * @param seatId the id of the seat.
+     * @return a seat
      */
-    public Seat reserve(final Long seatId) {
-        Seat seat = seatRepository.findById(seatId)
+    private Seat getSeatById(final Long seatId) {
+        return seatRepository.findById(seatId)
                 .orElseThrow(() ->
                         new EntityNotFoundException("No seat with this id."));
-        if (seat.isReserved()) {
-            throw new IllegalArgumentException("Seat is already reserved.");
+    }
+
+    /**
+     * Reserves the seat with the specified id.
+     * @param seatId         is the id of the to be reserved seat.
+     * @param reservationDto is the reservation details.
+     * @return the reserved seat.
+     */
+    public Seat reserve(final Long seatId,
+                        final ReservationDto reservationDto) {
+        if (reservationDto == null) {
+            throw new IllegalArgumentException("ReservationDto cannot be null");
         }
-        seat.setReserved(true);
+        Seat seat = getSeatById(seatId);
+        Reservation newReservation = new Reservation(
+                reservationDto.getStartTime(), reservationDto.getEndTime());
+        seat.addReservation(newReservation);
         seatRepository.save(seat);
         return seat;
     }
