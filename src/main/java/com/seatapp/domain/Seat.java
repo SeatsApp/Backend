@@ -54,7 +54,8 @@ public class Seat {
      * @param newReservation the new reservation.
      */
     public void addReservation(final Reservation newReservation) {
-        newReservation.checkNewReservation(this.reservations);
-        reservations.add(newReservation);
+        if (newReservation.isValidNewReservation(this.reservations)) {
+            reservations.add(newReservation);
+        }
     }
 }
