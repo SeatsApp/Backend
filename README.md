@@ -1,5 +1,11 @@
 # Backend
 
+## Enivonment variables
+<ul>
+<li>SONAR_TOKEN: this variables is for SonarCloud</li>
+<li>AZURE_CLIENT_SECRET: this variabel is for the Azure AD application client secret</li>
+</ul>
+
 ## Deploy 
 For creating an image, use this command: `docker build -t seatsapp .
 `
