@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * This is an api to create, read and delete seats.
  */
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:19006", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/")
 public class SeatsController {
@@ -35,6 +35,7 @@ public class SeatsController {
 
     /**
      * Creates the controller with a specified service.
+     *
      * @param seatService the seatService
      */
     @Autowired
@@ -44,6 +45,7 @@ public class SeatsController {
 
     /**
      * Creates a seat.
+     *
      * @param seatDto is a Dto containing the name of the seat.
      * @return Returns a responseEntity with the HttpStatus and a message.
      */
@@ -56,8 +58,9 @@ public class SeatsController {
                         + "\" is successfully created.");
     }
 
-     /**
+    /**
      * Deletes a seat with a certain id.
+     *
      * @param seatId the id of the to be deleted seat.
      * @return Returns a responseEntity with the HttpStatus and a message.
      */
@@ -69,11 +72,12 @@ public class SeatsController {
                 + " is successfully removed.");
     }
 
-     /**
+    /**
      * Takes all the seats from the database.
+     *
      * @return Returns a responseEntity with the HttpStatus and the found seats.
      */
-    @GetMapping("seats")
+    @GetMapping("/seats")
     public ResponseEntity<List<Seat>> getSeats() {
         List<Seat> foundSeats = seatService.getAll();
         return ResponseEntity.ok(foundSeats);
@@ -96,13 +100,13 @@ public class SeatsController {
 
     /**
      * Reserves an existing seat.
-     * @param seatId the Id of the to be reserved seat.
+     *
+     * @param seatId         the Id of the to be reserved seat.
      * @param reservationDto the reservation details.
      * @return Returns a response with the HttpStatus and a message.
      */
-    @PatchMapping("seats/{seatId}/reserve")
-    public ResponseEntity<String> reserveSeat(@PathVariable
-                                                  final Long seatId,
+    @PatchMapping("/seats/{seatId}/reserve")
+    public ResponseEntity<String> reserveSeat(@PathVariable final Long seatId,
                                               @RequestBody final
                                               ReservationDto reservationDto) {
         Seat reservedSeat = seatService.reserve(seatId, reservationDto);
