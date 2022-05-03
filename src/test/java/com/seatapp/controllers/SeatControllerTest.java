@@ -397,4 +397,29 @@ class SeatControllerTest {
                 .andExpect(content()
                         .string("Date can't be in the past."));
     }
+
+    @Test
+    @Transactional
+    void getSeatsWithReservationsByDate() throws Exception {
+        LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_14, 0, 0);
+        LocalDateTime endTimeNew = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
+
+        Seat seat1 = new Seat("Test1");
+        seat1.addReservation(new Reservation(startTimeNew, endTimeNew));
+        Seat savedSeat = seatRepository.save(seat1);
+
+        mockMvc.perform(get("/api/seats/reservations/date/2024-04-27"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .json("[{\"id\": " + savedSeat.getId()
+                                + ", \"name\": \"Test1\","
+                                + "\"reservations\": [{ \"id\": "
+                                + savedSeat.getReservations().get(0).getId()
+                                + ", "
+                                + "\"startTime\": \"2024-04-27T14:00:00\", "
+                                + "\"endTime\": \"2024-04-27T17:00:00\", "
+                                + "\"date\": \"2024-04-27\"}]}]"));
+    }
 }

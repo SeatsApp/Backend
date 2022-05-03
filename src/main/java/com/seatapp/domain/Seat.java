@@ -5,12 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.GenerationType;
 import javax.persistence.OneToMany;
-import javax.persistence.Column;
 import javax.persistence.CascadeType;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -39,7 +39,6 @@ public class Seat {
      */
     @OneToMany(cascade = CascadeType.ALL)
     private List<Reservation> reservations;
-
     /**
      * Creates a seat with a specified name.
      * @param name The seats' name
@@ -48,7 +47,6 @@ public class Seat {
         this.name = name;
         this.reservations = new ArrayList<>();
     }
-
     /**
      * Adds a reservation to the list after checks.
      * @param newReservation the new reservation.

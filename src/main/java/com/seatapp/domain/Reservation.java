@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Entity;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,6 +29,10 @@ public class Reservation {
      * Represents the end time of a reservation.
      */
     private LocalDateTime endTime;
+    /**
+     * Represents the date of a reservation.
+     */
+    private LocalDate date;
 
     /**
      * Creates reservation with the details.
@@ -39,6 +44,7 @@ public class Reservation {
                        final LocalDateTime endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
+        this.date = startTime.toLocalDate();
     }
 
     /**

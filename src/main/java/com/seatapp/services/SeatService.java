@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SeatService {
@@ -92,5 +94,20 @@ public class SeatService {
         seat.addReservation(newReservation);
         seatRepository.save(seat);
         return seat;
+    }
+
+    /**
+     * Gets all the seats with their reservations from the given date.
+     * @param date is the date of the wanted reservations.
+     * @return the list of seats.
+     */
+    public List<Seat> getAllWithReservationsByDate(final LocalDate date) {
+        List<Seat> foundSeats = getAll();
+        for (Seat s :foundSeats) {
+            s.setReservations(s.getReservations().stream()
+                    .filter(reservation -> reservation.getDate().equals(date))
+                    .collect(Collectors.toList()));
+        }
+        return foundSeats;
     }
 }

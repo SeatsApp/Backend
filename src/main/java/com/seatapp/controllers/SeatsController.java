@@ -5,6 +5,7 @@ import com.seatapp.controllers.dtos.SeatDto;
 import com.seatapp.domain.Seat;
 import com.seatapp.services.SeatService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -59,7 +61,7 @@ public class SeatsController {
      * @param seatId the id of the to be deleted seat.
      * @return Returns a responseEntity with the HttpStatus and a message.
      */
-    @DeleteMapping("/seats/{seatId}")
+    @DeleteMapping("seats/{seatId}")
     public ResponseEntity<String> deleteSeat(
             @PathVariable final Long seatId) {
         Seat deletedSeat = seatService.delete(seatId);
@@ -71,9 +73,24 @@ public class SeatsController {
      * Takes all the seats from the database.
      * @return Returns a responseEntity with the HttpStatus and the found seats.
      */
-    @GetMapping("/seats")
+    @GetMapping("seats")
     public ResponseEntity<List<Seat>> getSeats() {
         List<Seat> foundSeats = seatService.getAll();
+        return ResponseEntity.ok(foundSeats);
+    }
+
+    /**
+     * Takes all the seats from the database with the
+     * reservations from the given date.
+     * @param date the date where you want reservations from.
+     * @return Returns a responseEntity with the HttpStatus and the found seats.
+     */
+    @GetMapping("seats/reservations/date/{date}")
+    public ResponseEntity<List<Seat>> getSeatsWithReservationsByDate(
+             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+             @PathVariable final LocalDate date) {
+        List<Seat> foundSeats = seatService
+                .getAllWithReservationsByDate(date);
         return ResponseEntity.ok(foundSeats);
     }
 
@@ -83,7 +100,7 @@ public class SeatsController {
      * @param reservationDto the reservation details.
      * @return Returns a response with the HttpStatus and a message.
      */
-    @PatchMapping("/seats/{seatId}/reserve")
+    @PatchMapping("seats/{seatId}/reserve")
     public ResponseEntity<String> reserveSeat(@PathVariable
                                                   final Long seatId,
                                               @RequestBody final
