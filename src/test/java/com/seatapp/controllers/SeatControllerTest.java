@@ -32,7 +32,11 @@ class SeatControllerTest {
     /**
      * The year used in the tests.
      */
-    private static final int DATE_YEAR = 2022;
+    private static final int DATE_YEAR = 2024;
+    /**
+     * The year used in the tests.
+     */
+    private static final int DATE_YEAR_PAST = 2022;
     /**
      * The month used in tests.
      */
@@ -79,6 +83,10 @@ class SeatControllerTest {
      * Represents api url for /api/seats/.
      */
     private String apiSeatsUrl;
+    /**
+     * Represents api url for /reserve.
+     */
+    private String reserveString;
 
     /**
      * This method sets up necessary items for the tests.
@@ -87,6 +95,7 @@ class SeatControllerTest {
     void setup() {
         createSeatUrl = "/api/seat";
         apiSeatsUrl = "/api/seats/";
+        reserveString = "/reserve";
     }
 
     @Test
@@ -198,7 +207,7 @@ class SeatControllerTest {
         Seat toBeReservedSeat = seatRepository.save(new Seat("TestSeat"));
 
         mockMvc.perform(patch(apiSeatsUrl + toBeReservedSeat.getId()
-                        + "/reserve")
+                        + reserveString)
                         .content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -248,7 +257,7 @@ class SeatControllerTest {
         Seat savedSeat = seatRepository.save(toBeReservedSeat);
 
         mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
-                        + "/reserve").content(objectMapper
+                        + reserveString).content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -281,7 +290,7 @@ class SeatControllerTest {
         Seat savedSeat = seatRepository.save(toBeReservedSeat);
 
         mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
-                        + "/reserve").content(objectMapper
+                        + reserveString).content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -314,7 +323,7 @@ class SeatControllerTest {
         Seat savedSeat = seatRepository.save(toBeReservedSeat);
 
         mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
-                        + "/reserve").content(objectMapper
+                        + reserveString).content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -323,4 +332,69 @@ class SeatControllerTest {
                         .string("Timeslot already booked."));
     }
 
+    @Test
+    @Transactional
+    void reserveSeatThatHasInvalidTimes() throws Exception {
+        LocalDateTime startTimeExisting = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_14, 0, 0);
+        LocalDateTime endTimeExisting = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_17, 0, 0);
+        LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_17, 0, 0);
+        LocalDateTime endTimeNew = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
+                DATE_DAY, DATE_HOUR_13, 0, 0);
+
+        ReservationDto reservationDto =
+                new ReservationDto(startTimeNew, endTimeNew);
+
+        Seat toBeReservedSeat = new Seat(
+                "Seat");
+
+        toBeReservedSeat.getReservations()
+                .add(new Reservation(startTimeExisting, endTimeExisting));
+
+        Seat savedSeat = seatRepository.save(toBeReservedSeat);
+
+        mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
+                        + reserveString).content(objectMapper
+                                .writeValueAsString(reservationDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content()
+                        .string("The end time can't be before start."));
+    }
+
+    @Test
+    @Transactional
+    void reserveSeatThatHasDateInPast() throws Exception {
+        LocalDateTime startTimeExisting = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_13, 0, 0);
+        LocalDateTime endTimeExisting = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_14, 0, 0);
+        LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR_PAST,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_14, 0, 0);
+        LocalDateTime endTimeNew = LocalDateTime.of(DATE_YEAR_PAST,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
+
+        ReservationDto reservationDto =
+                new ReservationDto(startTimeNew, endTimeNew);
+
+        Seat toBeReservedSeat = new Seat(
+                "Seat");
+
+        toBeReservedSeat.getReservations()
+                .add(new Reservation(startTimeExisting, endTimeExisting));
+
+        Seat savedSeat = seatRepository.save(toBeReservedSeat);
+
+        mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
+                        + reserveString).content(objectMapper
+                                .writeValueAsString(reservationDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content()
+                        .string("Date can't be in the past."));
+    }
 }

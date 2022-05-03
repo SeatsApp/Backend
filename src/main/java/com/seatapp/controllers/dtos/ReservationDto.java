@@ -16,11 +16,11 @@ public class ReservationDto {
     /**
      * Represents the start time of a reservation.
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-M-d H:mm:ss")
     private LocalDateTime startTime;
     /**
      * Represents the end time of a reservation.
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-M-d H:mm:ss")
     private LocalDateTime endTime;
 }

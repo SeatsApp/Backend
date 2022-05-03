@@ -9,7 +9,23 @@ import lombok.Setter;
 @AllArgsConstructor @NoArgsConstructor
 public class SeatDto {
     /**
+     * Represents the seats' id.
+     */
+    private Long id;
+    /**
      * Represents the seats' name.
      */
     private String name;
+    /**
+     * Represents the seats' reservation status.
+     */
+    private boolean reserved;
+
+    /**
+     * Creates an seatdto with a name.
+     * @param name name of the seatdto.
+     */
+    public SeatDto(final String name) {
+        this.name = name;
+    }
 }

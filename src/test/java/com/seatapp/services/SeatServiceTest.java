@@ -1,8 +1,6 @@
 package com.seatapp.services;
 
-import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
-import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Seat;
 import com.seatapp.repositories.SeatRepository;
 import org.junit.jupiter.api.Test;
@@ -13,8 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,27 +22,6 @@ import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 class SeatServiceTest {
-    /**
-     * The year used in the tests.
-     */
-    private static final int DATE_YEAR = 2022;
-    /**
-     * The month used in tests.
-     */
-    private static final int DATE_MONTH = 4;
-    /**
-     * The day used in tests.
-     */
-    private static final int DATE_DAY = 27;
-    /**
-     * An hour used in the tests.
-     */
-    private static final int DATE_HOUR1 = 13;
-    /**
-     * An hour used in the tests.
-     */
-    private static final int DATE_HOUR2 = 15;
-
     /**
      * Represents the seat repository.
      */
@@ -70,10 +45,12 @@ class SeatServiceTest {
                 });
 
         //Act
-        Seat savedSeat = seatService.createSeat(new SeatDto("Test"));
+        Seat savedSeat = seatService.createSeat(
+                new SeatDto("Test"));
 
         //Assert
-        Seat expectedSeat = new Seat(1L, "Test", null);
+        Seat expectedSeat = new Seat(1L, "Test",
+                null);
         assertEquals(expectedSeat.getId(), savedSeat.getId());
         assertEquals(expectedSeat.getName(), savedSeat.getName());
     }
@@ -149,98 +126,5 @@ class SeatServiceTest {
         //assert
         assertNotNull(seats);
         assertTrue(seats.isEmpty());
-    }
-
-    @Test
-    void reserveSeatWithValidId() {
-        //Given
-        LocalDateTime startTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
-                DATE_DAY, DATE_HOUR1, 0, 0);
-        LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
-                DATE_DAY, DATE_HOUR2, 0, 0);
-
-        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
-
-        Seat toBeReservedSeat = new Seat("ReservedSeat");
-        toBeReservedSeat.setId(1L);
-
-        Mockito.when(seatRepository.save(Mockito.any(Seat.class)))
-                .thenAnswer(i -> {
-                    Seat seat = i.getArgument(0);
-                    seat.setId(1L);
-                    return seat;
-                });
-
-        Mockito.when(seatRepository.findById(toBeReservedSeat.getId()))
-                .thenReturn(java.util.Optional.of(toBeReservedSeat));
-
-        //Act
-        Seat reservedSeat = seatService
-                .reserve(toBeReservedSeat.getId(), reservationDto);
-
-        //Assert
-        assertEquals(toBeReservedSeat.getId(), reservedSeat.getId());
-        assertEquals(toBeReservedSeat.getName(), reservedSeat.getName());
-        assertEquals(toBeReservedSeat.getReservations().get(0).getId(),
-                reservedSeat.getReservations().get(0).getId());
-    }
-
-    @Test
-    void reserveSeatWithNoValidId() {
-        LocalDateTime startTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
-                DATE_DAY, DATE_HOUR1, 0, 0);
-        LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
-                DATE_DAY, DATE_HOUR2, 0, 0);
-
-        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
-
-        Exception exception = assertThrows(EntityNotFoundException.class,
-                () -> {
-                    seatService.reserve(1L, reservationDto);
-                });
-
-        String expectedMessage = "No seat with this id.";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @Test
-    void reserveSeatWithThatIsAlreadyReserved() {
-        LocalDateTime startTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
-                DATE_DAY, DATE_HOUR1, 0, 0);
-        LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
-                DATE_DAY, DATE_HOUR2, 0, 0);
-
-        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
-
-        Seat toBeReservedSeat = new Seat(1L, "ReservedSeat",
-                new ArrayList<>());
-        toBeReservedSeat.getReservations()
-                .add(new Reservation(startTime, endTime));
-
-        Mockito.when(seatRepository.findById(toBeReservedSeat.getId()))
-                .thenReturn(java.util.Optional.of(toBeReservedSeat));
-
-        Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> {
-                    seatService.reserve(1L, reservationDto);
-                });
-
-        String expectedMessage = "Timeslot already booked.";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @Test
-    void reserveSeatTestWithNull() {
-        Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> seatService.reserve(1L, null));
-
-        String expectedMessage = "ReservationDto cannot be null";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
     }
 }
