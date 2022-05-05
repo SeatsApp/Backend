@@ -56,6 +56,8 @@ class SeatTests {
                 endTimeNew));
 
         assertEquals(2, seat.getReservations().size());
+        assertEquals("2024-04-27", seat.getReservations()
+                .get(1).getDate().toString());
     }
 
     @Test
