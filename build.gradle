@@ -35,6 +35,9 @@ dependencies {
 	// Checkstyle
 	implementation 'com.puppycrawl.tools:checkstyle:10.1'
 
+	// Spring boot health check
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.6.7'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok:1.18.24'
 	annotationProcessor 'org.projectlombok:lombok:1.18.24'
