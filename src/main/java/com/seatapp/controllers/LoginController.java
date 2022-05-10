@@ -50,7 +50,7 @@ public class LoginController {
      * @return a http response OK
      */
     @GetMapping("healthcheck")
-    public ResponseEntity<Void> healthCheck(
+    public ResponseEntity<Void> healthCheckLogin(
             final UsernamePasswordAuthenticationToken token) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Jwt token of {} verified", token.getName());
