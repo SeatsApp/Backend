@@ -54,24 +54,31 @@ public class Reservation {
      * @return boolean that indicates if the reservation is valid.
      */
     public boolean isValidNewReservation(final List<Reservation>
-                                              existingReservations) {
+                                                 existingReservations) {
         LocalDateTime startTimeNew = this.getStartTime();
         LocalDateTime endTimeNew = this.getEndTime();
         if (!checkIfStartTimeIsBeforeEndTime(startTimeNew, endTimeNew)) {
-            throw new IllegalArgumentException(
-                    "The end time can't be before start.");
+            return false;
         }
-        if (!checkIfDateIsBeforeNow(startTimeNew)) {
-            throw new IllegalArgumentException(
-                    "Date can't be in the past.");
+        if (!checkIfDateIsAfterNow(startTimeNew)) {
+            return false;
         }
+        return checkReservationsIfTimeslotFree(existingReservations,
+                startTimeNew, endTimeNew);
+    }
+
+    private boolean checkReservationsIfTimeslotFree(
+            final List<Reservation> existingReservations,
+            final LocalDateTime startTimeNew,
+            final LocalDateTime endTimeNew) {
+
         for (Reservation seatRes : existingReservations) {
             LocalDateTime startTimeExisting = seatRes.getStartTime();
             LocalDateTime endTimeExisting = seatRes.getEndTime();
+
             if (!checkIfTimeslotFree(startTimeNew, startTimeExisting,
                     endTimeNew, endTimeExisting)) {
-                throw new IllegalArgumentException(
-                        "Timeslot already booked.");
+                return false;
             }
         }
         return true;
@@ -79,42 +86,50 @@ public class Reservation {
 
     /**
      * Checks if the chosen timeslot is valid.
-     * @param startTimeNew the chosen timeslots start time.
+     *
+     * @param startTimeNew      the chosen timeslots start time.
      * @param startTimeExisting the existing reservations start time.
-     * @param endTimeNew the chosen timeslots end time.
-     * @param endTimeExisting the existing reservations end time.
+     * @param endTimeNew        the chosen timeslots end time.
+     * @param endTimeExisting   the existing reservations end time.
      * @return true if timeslot is free else false.
      */
     public boolean checkIfTimeslotFree(final LocalDateTime startTimeNew,
-                               final LocalDateTime startTimeExisting,
-                               final LocalDateTime endTimeNew,
-                               final LocalDateTime endTimeExisting) {
-       return !(startTimeNew.isEqual(startTimeExisting)
-                || startTimeNew.isAfter(startTimeExisting)
-                && startTimeNew.isBefore(endTimeExisting)
-                || startTimeNew.isBefore(startTimeExisting)
+                                       final LocalDateTime startTimeExisting,
+                                       final LocalDateTime endTimeNew,
+                                       final LocalDateTime endTimeExisting) {
+        if (startTimeNew.isEqual(startTimeExisting)) {
+            return false;
+        }
+        if (startTimeNew.isAfter(startTimeExisting)
+                && startTimeNew.isBefore(endTimeExisting)) {
+            return false;
+        }
+
+        return !(startTimeNew.isBefore(startTimeExisting)
                 && endTimeNew.isAfter(startTimeExisting));
     }
 
     /**
      * Checks if the end time isn't before the start time.
+     *
      * @param startTimeNew start time of the timeslot.
-     * @param endTimeNew end time of the timeslot
+     * @param endTimeNew   end time of the timeslot
      * @return true if timeslot is valid else false.
      */
     public boolean checkIfStartTimeIsBeforeEndTime(final LocalDateTime
                                                            startTimeNew,
                                                    final LocalDateTime
                                                            endTimeNew) {
-        return startTimeNew.getHour() < endTimeNew.getHour();
+        return startTimeNew.isBefore(endTimeNew);
     }
 
     /**
      * Checks if the start time isn't before the current date and time.
+     *
      * @param startTimeNew start time of the timeslot.
      * @return true if date is valid else false.
      */
-    public boolean checkIfDateIsBeforeNow(final LocalDateTime startTimeNew) {
+    public boolean checkIfDateIsAfterNow(final LocalDateTime startTimeNew) {
         return startTimeNew.isAfter(LocalDateTime.now());
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @CrossOrigin(origins = "http://localhost:19006", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api/seats")
 public class SeatsController {
     /**
      * Represents the service that is called.
@@ -49,13 +50,12 @@ public class SeatsController {
      * @param seatDto is a Dto containing the name of the seat.
      * @return Returns a responseEntity with the HttpStatus and a message.
      */
-    @PostMapping("/seat")
+    @PostMapping
     public ResponseEntity<String> createSeat(
             @RequestBody final SeatDto seatDto) {
         Seat createdSeat = seatService.createSeat(seatDto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Seat with name: \"" + createdSeat.getName()
-                        + "\" is successfully created.");
+        return ResponseEntity.created(URI.create("/api/seats/"
+                + createdSeat.getId())).build();
     }
 
     /**
@@ -64,12 +64,11 @@ public class SeatsController {
      * @param seatId the id of the to be deleted seat.
      * @return Returns a responseEntity with the HttpStatus and a message.
      */
-    @DeleteMapping("seats/{seatId}")
+    @DeleteMapping("{seatId}")
     public ResponseEntity<String> deleteSeat(
             @PathVariable final Long seatId) {
-        Seat deletedSeat = seatService.delete(seatId);
-        return ResponseEntity.ok("Seat with id: " + deletedSeat.getId()
-                + " is successfully removed.");
+        seatService.delete(seatId);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -77,7 +76,7 @@ public class SeatsController {
      *
      * @return Returns a responseEntity with the HttpStatus and the found seats.
      */
-    @GetMapping("/seats")
+    @GetMapping
     public ResponseEntity<List<Seat>> getSeats() {
         List<Seat> foundSeats = seatService.getAll();
         return ResponseEntity.ok(foundSeats);
@@ -89,7 +88,7 @@ public class SeatsController {
      * @param date the date where you want reservations from.
      * @return Returns a responseEntity with the HttpStatus and the found seats.
      */
-    @GetMapping("seats/reservations/date/{date}")
+    @GetMapping("reservations/date/{date}")
     public ResponseEntity<List<Seat>> getSeatsWithReservationsByDate(
              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
              @PathVariable final LocalDate date) {
@@ -105,7 +104,7 @@ public class SeatsController {
      * @param reservationDto the reservation details.
      * @return Returns a response with the HttpStatus and a message.
      */
-    @PatchMapping("/seats/{seatId}/reserve")
+    @PatchMapping("{seatId}/reserve")
     public ResponseEntity<String> reserveSeat(@PathVariable final Long seatId,
                                               @RequestBody final
                                               ReservationDto reservationDto) {

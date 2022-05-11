@@ -127,7 +127,7 @@ class ReservationTests {
         LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR_FUTURE,
                 DATE_MONTH, DATE_DAY, DATE_HOUR14, 0, 0);
 
-        assertTrue(reservation.checkIfDateIsBeforeNow(startTimeNew));
+        assertTrue(reservation.checkIfDateIsAfterNow(startTimeNew));
     }
 
     @Test
@@ -137,6 +137,6 @@ class ReservationTests {
         LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR_PAST,
                 DATE_MONTH, DATE_DAY, DATE_HOUR14, 0, 0);
 
-        assertFalse(reservation.checkIfDateIsBeforeNow(startTimeNew));
+        assertFalse(reservation.checkIfDateIsAfterNow(startTimeNew));
     }
 }

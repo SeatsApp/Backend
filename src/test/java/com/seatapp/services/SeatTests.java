@@ -5,6 +5,7 @@ import com.seatapp.domain.Seat;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.test.context.SpringBootTest;
+
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,13 +77,9 @@ class SeatTests {
                 DATE_MONTH, DATE_DAY, DATE_HOUR16, 0, 0);
         Reservation newReservation = new Reservation(startTimeNew, endTimeNew);
 
-        Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> {
-            seat.addReservation(newReservation);
-        });
+        assertThrows(IllegalArgumentException.class,
+                () -> seat.addReservation(newReservation));
 
-        assertEquals("Timeslot already booked.",
-                exception.getMessage());
         assertEquals(1, seat.getReservations().size());
     }
 }
