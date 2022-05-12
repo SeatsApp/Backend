@@ -3,10 +3,11 @@ package com.seatapp.services.usermanagement;
 import com.seatapp.domain.usermanagement.User;
 import com.seatapp.repositories.usermanagement.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
@@ -15,17 +16,17 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-class UserServiceTest {
+class UserServiceImplTest {
     /**
      * Represents the user repository.
      */
-    @MockBean
+    @Mock
     private UserRepository userRepository;
     /**
      * Represents the user service.
      */
-    @Autowired
-    private UserService userService;
+    @InjectMocks
+    private UserServiceImpl userService;
     /**
      * Represents the password encoder.
      */
@@ -40,9 +41,7 @@ class UserServiceTest {
         String password = "Test";
 
         Mockito.when(userRepository.save(Mockito.any(User.class)))
-                .thenAnswer(i -> {
-                    return i.<User>getArgument(0);
-                });
+                .thenAnswer(i -> i.<User>getArgument(0));
 
         // Act
         User user = userService.createUser(email, fullName, password,
@@ -67,9 +66,7 @@ class UserServiceTest {
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class,
-                () -> {
-                    userService.createUser(email, fullName, password,
-                            passwordEncoder);
-                });
+                () -> userService.createUser(email, fullName, password,
+                        passwordEncoder));
     }
 }

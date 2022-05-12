@@ -7,10 +7,10 @@ import com.seatapp.domain.usermanagement.User;
 import com.seatapp.repositories.SeatRepository;
 import org.junit.jupiter.api.Test;
 
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -26,18 +26,18 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class SeatServiceTest {
+class SeatServiceImplTest {
     /**
      * Represents the seat repository.
      */
-    @MockBean
+    @Mock
     private SeatRepository seatRepository;
 
     /**
      * Represents the seat service.
      */
-    @Autowired
-    private SeatService seatService;
+    @InjectMocks
+    private SeatServiceImpl seatService;
 
     /**
      * Username used in the tests.
@@ -180,8 +180,8 @@ class SeatServiceTest {
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(2), VALID_USER));
 
-        given(seatRepository.findById(seat.getId()))
-                .willReturn(java.util.Optional.of(seat));
+        when(seatRepository.findById(seat.getId()))
+                .thenReturn(java.util.Optional.of(seat));
 
         String username = VALID_USER.getEmail();
         Long seatId = seat.getId();

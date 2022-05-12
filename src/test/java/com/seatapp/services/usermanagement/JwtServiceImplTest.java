@@ -14,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
-class JwtUtilsTest {
+class JwtServiceImplTest {
     /**
      * Representing the JWT utilities.
      */
     @Autowired
-    private JwtUtils jwtUtils;
+    private JwtServiceImpl jwtService;
 
     @Test
     void generateToken() {
@@ -35,16 +35,16 @@ class JwtUtilsTest {
                         new ArrayList<>()));
 
         // Act
-        String jwt = jwtUtils.generateToken(authentication);
+        String jwt = jwtService.generateToken(authentication);
 
         // Assert
-        assertEquals(username, jwtUtils.getEmailFromJwtToken(jwt));
+        assertEquals(username, jwtService.getEmailFromJwtToken(jwt));
     }
 
     @Test
     void validateTokenWhenEmptyTokenTest() {
         // Act
-        boolean validation = jwtUtils.validateJwtToken("");
+        boolean validation = jwtService.validateJwtToken("");
 
         // Assert
         assertFalse(validation);
@@ -53,7 +53,7 @@ class JwtUtilsTest {
     @Test
     void validateTokenWhenInvalidSignatureTokenTest() {
         // Act
-        boolean validation = jwtUtils.validateJwtToken("eyJhbGciOiJIUzUxMiJ9."
+        boolean validation = jwtService.validateJwtToken("eyJhbGciOiJIUzUxMiJ9."
                 + "eyJzdWIiOiJUaG9tYXMgVmFuIERlIFdhbGxlIiwiZXhwIjoxNjUyMDc5ODg3"
                 + "LCJpYXQiOjE2NTE5OTM0ODd9.BPwt8xEyEkBUapIQKYpJP"
                 + "dDt80khWQzB7Nm7TsIJhbvjJ5msbRusifMHEzHkc4mDo8Ih0W9g");
@@ -65,7 +65,7 @@ class JwtUtilsTest {
     @Test
     void validateTokenExpiredTest() {
         // Act
-        boolean validation = jwtUtils.validateJwtToken(
+        boolean validation = jwtService.validateJwtToken(
                 "eyJhbGciOiJIUzUxMiJ9."
                 + "eyJzdWIiOiJUaG9tYXMgVmFuIERlIF"
                 + "dhbGxlIiwiZXhwIjoxNjUyMDc5ODg3"

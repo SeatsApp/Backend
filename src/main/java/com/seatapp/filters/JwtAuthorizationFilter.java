@@ -1,7 +1,7 @@
 package com.seatapp.filters;
 
-import com.seatapp.services.usermanagement.JwtUtils;
-import com.seatapp.services.usermanagement.JwtUserDetailsService;
+import com.seatapp.services.usermanagement.JwtServiceImpl;
+import com.seatapp.services.usermanagement.JwtUserDetailsServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,11 +23,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     /**
      * The service to authenticate and create JWT tokens.
      */
-    private final JwtUtils jwtUtils;
+    private final JwtServiceImpl jwtServiceImpl;
     /**
      * The service to handle the login of user with JWT tokens.
      */
-    private final JwtUserDetailsService userDetailsService;
+    private final JwtUserDetailsServiceImpl userDetailsService;
     /**
      * The paths given will be excluded from the filter
      * if the url contains these paths.
@@ -39,7 +39,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
      * of JWT tokens on certain paths.
      *
      * @param authManager             the authorization manager
-     * @param jwtUtils                the service which handles the
+     * @param jwtServiceImpl                the service which handles the
      *                                authentication and creation of
      *                                the JWT tokens
      * @param userDetailsService      the service that handles the calls
@@ -49,12 +49,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
      *                                it is contained in the url
      */
     public JwtAuthorizationFilter(final AuthenticationManager authManager,
-                                  final JwtUtils jwtUtils,
+                                  final JwtServiceImpl jwtServiceImpl,
                                   final
-                                  JwtUserDetailsService userDetailsService,
+                                  JwtUserDetailsServiceImpl userDetailsService,
                                   final String... excludedPathsFromFilter) {
         super(authManager);
-        this.jwtUtils = jwtUtils;
+        this.jwtServiceImpl = jwtServiceImpl;
         this.userDetailsService = userDetailsService;
         this.excludedPathsFromFilter =
                 Arrays.stream(excludedPathsFromFilter).toList();
@@ -71,11 +71,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         if (!hasExcludedPath) {
             String jwt = parseJwt(request);
-            if (jwt == null || !jwtUtils.validateJwtToken(jwt)) {
+            if (jwt == null || !jwtServiceImpl.validateJwtToken(jwt)) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 return;
             } else {
-                String email = jwtUtils.getEmailFromJwtToken(jwt);
+                String email = jwtServiceImpl.getEmailFromJwtToken(jwt);
 
                 UserDetails userDetails =
                         userDetailsService.loadUserByUsername(email);

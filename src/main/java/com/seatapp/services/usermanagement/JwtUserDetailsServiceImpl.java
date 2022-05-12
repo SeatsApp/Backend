@@ -6,14 +6,12 @@ import com.seatapp.repositories.usermanagement.UserRepository;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 
 @Service
-public class JwtUserDetailsService implements UserDetailsService {
+public class JwtUserDetailsServiceImpl implements JwtUserDetailService {
     /**
      * Represents the user repository.
      */
@@ -25,7 +23,7 @@ public class JwtUserDetailsService implements UserDetailsService {
      * @param userRepository the user repository
      */
     @Autowired
-    public JwtUserDetailsService(final UserRepository userRepository) {
+    public JwtUserDetailsServiceImpl(final UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -33,12 +31,11 @@ public class JwtUserDetailsService implements UserDetailsService {
      * Load the user from the repository by email.
      *
      * @param email the email of the user that
-     *                 you want to load
+     *              you want to load
      * @return the found UserDetails
      */
     @SneakyThrows
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(final String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException(
