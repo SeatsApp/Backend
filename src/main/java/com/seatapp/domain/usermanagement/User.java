@@ -1,14 +1,17 @@
 package com.seatapp.domain.usermanagement;
 
+import com.seatapp.domain.Reservation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,15 +20,10 @@ import javax.persistence.Id;
 @AllArgsConstructor
 public class User {
     /**
-     * The id of the user.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    /**
      * The email of the user.
      */
+    @Id
+    @Column(name = "email")
     private String email;
 
     /**
@@ -42,6 +40,13 @@ public class User {
      * The role of the user.
      */
     private String role;
+
+    /**
+     * The users' reservations.
+     */
+    @OneToMany
+    @JoinColumn(name = "email")
+    private List<Reservation> reservations;
 
     /**
      * Creates a user.

@@ -1,11 +1,15 @@
 package com.seatapp.services;
 
 import com.seatapp.domain.Reservation;
+import com.seatapp.domain.usermanagement.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @SpringBootTest
 class ReservationTests {
@@ -41,6 +45,13 @@ class ReservationTests {
      * An hour used in the tests.
      */
     private static final int DATE_HOUR16 = 16;
+    /**
+     * Username used in the tests.
+     */
+    private static final User VALID_USER =
+            new User("User1",
+                    "User@Test.be",
+                    "User1");
 
     @Test
     void checkIfTimeslotFreeWithSameHours() {
@@ -138,5 +149,56 @@ class ReservationTests {
                 DATE_MONTH, DATE_DAY, DATE_HOUR14, 0, 0);
 
         assertFalse(reservation.checkIfDateIsAfterNow(startTimeNew));
+    }
+
+    @Test
+    void checkInTest() {
+        LocalDateTime startTimeNew = LocalDateTime.now();
+        LocalDateTime endTimeNew = LocalDateTime.now().plusHours(1);
+
+        Reservation reservation = new Reservation(startTimeNew, endTimeNew,
+                VALID_USER);
+
+        reservation.checkIn(VALID_USER.getEmail());
+
+        assertTrue(reservation.isCheckedIn());
+    }
+
+    @Test
+    void checkInAlreadyCheckedInReservation() {
+        LocalDateTime startTimeNew = LocalDateTime.now();
+        LocalDateTime endTimeNew = LocalDateTime.now().plusHours(1);
+
+        Reservation reservation = new Reservation(startTimeNew, endTimeNew,
+                VALID_USER);
+        String username = VALID_USER.getEmail();
+        reservation.checkIn(username);
+
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> reservation.checkIn(username));
+
+        String expectedMessage = "This reservation is already checked in.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void checkInWrongUsername() {
+        LocalDateTime startTimeNew = LocalDateTime.now();
+        LocalDateTime endTimeNew = LocalDateTime.now().plusHours(1);
+
+        Reservation reservation = new Reservation(startTimeNew, endTimeNew,
+                VALID_USER);
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> reservation.checkIn("NotValidUsername"));
+
+        String expectedMessage =
+                "You didn't reserve this seat for this timeslot.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 }

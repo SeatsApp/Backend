@@ -41,9 +41,7 @@ class UserServiceTest {
 
         Mockito.when(userRepository.save(Mockito.any(User.class)))
                 .thenAnswer(i -> {
-                    User user = i.getArgument(0);
-                    user.setId(1L);
-                    return user;
+                    return i.<User>getArgument(0);
                 });
 
         // Act
@@ -51,10 +49,9 @@ class UserServiceTest {
                 passwordEncoder);
 
         // Assert
-        assertEquals(email, user.getEmail());
         assertEquals(fullName, user.getFullName());
+        assertEquals(email, user.getEmail());
         assertNotEquals(password, user.getPassword());
-        assertEquals(1L, user.getId());
     }
 
     @Test

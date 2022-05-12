@@ -4,12 +4,15 @@ import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
 import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Seat;
+import com.seatapp.domain.usermanagement.User;
 import com.seatapp.repositories.SeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +22,13 @@ public class SeatService {
      * Represents the seat repository.
      */
     private final SeatRepository seatRepository;
+
+    /**
+     * Time before the start of a
+     * reservation where you can check in.
+     */
+    @Value("${minutes.before.reservation}")
+    private int minutesBeforeReservation;
 
     /**
      * Creates a service with the specified repository.
@@ -82,16 +92,18 @@ public class SeatService {
      *
      * @param seatId         is the id of the to be reserved seat.
      * @param reservationDto is the reservation details.
+     * @param user           the user wanting to make a reservation.
      * @return the reserved seat.
      */
     public Seat reserve(final Long seatId,
-                        final ReservationDto reservationDto) {
+                        final ReservationDto reservationDto, final User user) {
         if (reservationDto == null) {
             throw new IllegalArgumentException("ReservationDto cannot be null");
         }
         Seat seat = getSeatById(seatId);
         Reservation newReservation = new Reservation(
-                reservationDto.getStartTime(), reservationDto.getEndTime());
+                reservationDto.getStartTime(),
+                reservationDto.getEndTime(), user);
         seat.addReservation(newReservation);
         seatRepository.save(seat);
         return seat;
@@ -111,5 +123,30 @@ public class SeatService {
                     .collect(Collectors.toList()));
         }
         return foundSeats;
+    }
+
+    /**
+     * Checks in on the reservation of the seat.
+     *
+     * @param seatId   the seatId from the seat where you check in.
+     * @param username username of the person wanting to check in.
+     */
+    public void checkInOnSeat(final Long seatId, final String username) {
+        Seat seat = getSeatById(seatId);
+
+        Reservation reservation = seat.getReservations().stream()
+                .filter(res -> {
+                    LocalDateTime startCheckInTime = res.getStartTime()
+                            .minusMinutes(minutesBeforeReservation);
+                    return LocalDateTime.now().isAfter(startCheckInTime);
+                })
+                .filter(res -> LocalDateTime.now()
+                        .isBefore(res.getEndTime())).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "You can't check in before the start"
+                + " time or after the end time."));
+
+                reservation.checkIn(username);
+        seatRepository.save(seat);
     }
 }

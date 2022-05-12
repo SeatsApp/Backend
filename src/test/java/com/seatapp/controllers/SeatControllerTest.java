@@ -5,19 +5,26 @@ import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
 import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Seat;
+import com.seatapp.domain.usermanagement.User;
 import com.seatapp.repositories.SeatRepository;
+import com.seatapp.services.usermanagement.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -57,11 +64,36 @@ class SeatControllerTest {
      * An hour used in the tests.
      */
     private static final int DATE_HOUR_14 = 14;
+
+    /**
+     * Username used in the tests.
+     */
+    private static final User VALID_USER =
+            new User("User1",
+                    "User@Test.be",
+                    "User1");
+
+    /**
+     * jwt token used in the tests.
+     */
+    private String jwt;
+
+    /**
+     * Authentication token used in the tests.
+     */
+    private UsernamePasswordAuthenticationToken token;
+
     /**
      * Represents mockMvc.
      */
     @Autowired
     private MockMvc mockMvc;
+
+    /**
+     * Represents the spring security filter chain.
+     */
+    @Autowired
+    private FilterChainProxy springSecurityFilterChain;
 
     /**
      * Represents the seat repository.
@@ -85,6 +117,28 @@ class SeatControllerTest {
     private String reserveString;
 
     /**
+     *  Represents userService.
+     */
+    @Autowired
+    private UserService userService;
+
+    /**
+     * The application context.
+     */
+    @Autowired
+    private WebApplicationContext context;
+
+    /**
+     * Variable to prevent repetitive strings in code.
+     */
+    private String authorizationString;
+
+    /**
+     * Variable to prevent repetitive strings in code.
+     */
+    private String bearerString;
+
+    /**
      * This method sets up necessary items for the tests.
      */
     @BeforeEach
@@ -92,15 +146,31 @@ class SeatControllerTest {
         apiSeatsUrl = "/api/seats/";
         reserveString = "/reserve";
         seatRepository.deleteAll();
+        authorizationString = "authorization";
+        bearerString = "Bearer ";
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(this.context)
+                .addFilter(springSecurityFilterChain)
+                .build();
+
+        jwt = userService.login("User1",
+                "User@Test.be", "PW");
+
+        token = new UsernamePasswordAuthenticationToken(
+                "User1", "PW");
     }
 
     @Test
     @Transactional
     void createSeat() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, "Test", false);
+        SeatDto seatDto = new SeatDto(1L, "Test");
 
         mockMvc.perform(post(apiSeatsUrl)
-                        .content(objectMapper.writeValueAsString(seatDto))
+                        .with(authentication(token))
+                        .header(authorizationString,
+                                bearerString + jwt)
+                        .content(objectMapper
+                                .writeValueAsString(seatDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -116,10 +186,11 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithEmptyStringAsName() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, "", false);
+        SeatDto seatDto = new SeatDto(1L, "");
 
         mockMvc.perform(post(apiSeatsUrl)
-                        .content(objectMapper.writeValueAsString(seatDto))
+                        .content(objectMapper
+                                .writeValueAsString(seatDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -127,10 +198,11 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithNameNull() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, null, false);
+        SeatDto seatDto = new SeatDto(1L, null);
 
         mockMvc.perform(post(apiSeatsUrl)
-                        .content(objectMapper.writeValueAsString(seatDto))
+                        .content(objectMapper
+                                .writeValueAsString(seatDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -150,14 +222,20 @@ class SeatControllerTest {
     void deleteSeatWithValidId() throws Exception {
         Seat toBeDeletedSeat = seatRepository.save(new Seat("TestSeat"));
 
-        mockMvc.perform(delete(apiSeatsUrl + toBeDeletedSeat.getId()))
+        mockMvc.perform(delete(apiSeatsUrl
+                        + toBeDeletedSeat.getId())
+                        .with(authentication(token))
+                .header(authorizationString, bearerString
+                        + jwt))
                 .andExpect(status().isOk());
     }
 
     @Test
     @Transactional
     void deleteSeatWithInValidId() throws Exception {
-        mockMvc.perform(delete("/api/seats/1"))
+        mockMvc.perform(delete(apiSeatsUrl + "1").with(authentication(token))
+                .header(authorizationString, bearerString
+                        + jwt))
                 .andExpect(status().isBadRequest());
     }
 
@@ -167,7 +245,10 @@ class SeatControllerTest {
         Seat seat1 = seatRepository.save(new Seat("Test1"));
         Seat seat2 = seatRepository.save(new Seat("Test2"));
 
-        mockMvc.perform(get("/api/seats"))
+        mockMvc.perform(get(apiSeatsUrl)
+                        .with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .json("[{\"id\": " + seat1.getId()
@@ -179,7 +260,10 @@ class SeatControllerTest {
     @Test
     @Transactional
     void getSeatsWithEmptyDatabase() throws Exception {
-        mockMvc.perform(get("/api/seats"))
+        mockMvc.perform(get(apiSeatsUrl)
+                        .with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .json("[]"));
@@ -198,7 +282,8 @@ class SeatControllerTest {
         Seat toBeReservedSeat = seatRepository.save(new Seat("TestSeat"));
 
         mockMvc.perform(patch(apiSeatsUrl + toBeReservedSeat.getId()
-                        + reserveString)
+                        + reserveString).with(authentication(token))
+                        .header(authorizationString, bearerString + jwt)
                         .content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -217,6 +302,9 @@ class SeatControllerTest {
         ReservationDto reservationDto = new ReservationDto(startTime, endTime);
 
         mockMvc.perform(patch("/api/seats/1/reserve")
+                        .with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt)
                         .content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -238,12 +326,14 @@ class SeatControllerTest {
                 "TestSeat");
 
         toBeReservedSeat.getReservations()
-                .add(new Reservation(startTime, endTime));
+                .add(new Reservation(startTime, endTime, VALID_USER));
 
         Seat savedSeat = seatRepository.save(toBeReservedSeat);
 
         mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
-                        + reserveString).content(objectMapper
+                        + reserveString).with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt).content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -269,12 +359,15 @@ class SeatControllerTest {
                 "Seat");
 
         toBeReservedSeat.getReservations()
-                .add(new Reservation(startTimeExisting, endTimeExisting));
+                .add(new Reservation(startTimeExisting, endTimeExisting,
+                        VALID_USER));
 
         Seat savedSeat = seatRepository.save(toBeReservedSeat);
 
         mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
-                        + reserveString).content(objectMapper
+                        + reserveString).with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt).content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -300,12 +393,15 @@ class SeatControllerTest {
                 "Seat");
 
         toBeReservedSeat.getReservations()
-                .add(new Reservation(startTimeExisting, endTimeExisting));
+                .add(new Reservation(startTimeExisting, endTimeExisting,
+                        VALID_USER));
 
         Seat savedSeat = seatRepository.save(toBeReservedSeat);
 
         mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
-                        + reserveString).content(objectMapper
+                        + reserveString).with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt).content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -331,12 +427,15 @@ class SeatControllerTest {
                 "Seat");
 
         toBeReservedSeat.getReservations()
-                .add(new Reservation(startTimeExisting, endTimeExisting));
+                .add(new Reservation(startTimeExisting, endTimeExisting,
+                        VALID_USER));
 
         Seat savedSeat = seatRepository.save(toBeReservedSeat);
 
         mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
-                        + reserveString).content(objectMapper
+                        + reserveString).with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt).content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -362,12 +461,15 @@ class SeatControllerTest {
                 "Seat");
 
         toBeReservedSeat.getReservations()
-                .add(new Reservation(startTimeExisting, endTimeExisting));
+                .add(new Reservation(startTimeExisting, endTimeExisting,
+                        VALID_USER));
 
         Seat savedSeat = seatRepository.save(toBeReservedSeat);
 
         mockMvc.perform(patch(apiSeatsUrl + savedSeat.getId()
-                        + reserveString).content(objectMapper
+                        + reserveString).with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt).content(objectMapper
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -383,10 +485,14 @@ class SeatControllerTest {
                 DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
 
         Seat seat1 = new Seat("Test1");
-        seat1.addReservation(new Reservation(startTimeNew, endTimeNew));
+        seat1.addReservation(new Reservation(startTimeNew, endTimeNew,
+                VALID_USER));
         Seat savedSeat = seatRepository.save(seat1);
 
-        mockMvc.perform(get("/api/seats/reservations/date/2024-04-27"))
+        mockMvc.perform(get("/api/seats/reservations/date/2024-04-27")
+                        .with(authentication(token))
+                        .header(authorizationString, bearerString
+                                + jwt))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .json("[{\"id\": " + savedSeat.getId()
@@ -397,5 +503,20 @@ class SeatControllerTest {
                                 + "\"startTime\": \"2024-04-27T14:00:00\", "
                                 + "\"endTime\": \"2024-04-27T17:00:00\", "
                                 + "\"date\": \"2024-04-27\"}]}]"));
+    }
+
+    @Test
+    @Transactional
+    void checkInSeat() throws Exception {
+        Seat seat1 = new Seat("Test1");
+        seat1.getReservations().add(new Reservation(
+                LocalDateTime.now(), LocalDateTime.now().plusHours(1),
+                VALID_USER));
+        Seat savedSeat = seatRepository.save(seat1);
+
+        mockMvc.perform(patch("/api/seats/" + savedSeat.getId() + "/checkIn")
+                        .with(authentication(token))
+                        .header(authorizationString, bearerString + jwt))
+                .andExpect(status().isOk());
     }
 }

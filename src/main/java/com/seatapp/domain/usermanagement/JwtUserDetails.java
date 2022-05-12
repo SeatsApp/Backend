@@ -15,10 +15,6 @@ import java.util.stream.Stream;
 public class JwtUserDetails implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
-    /**
-     * The id of the JWT user.
-     */
-    private final Long id;
 
     /**
      * The email of the JWT user.
@@ -44,17 +40,15 @@ public class JwtUserDetails implements UserDetails {
     /**
      * Create the JwtUserDetails.
      *
-     * @param id          the id from the user
      * @param email       the email from the user
      * @param fullName    the full name from the user
      * @param password    the encoded password from the user
      * @param authorities the role from the user
      */
-    public JwtUserDetails(final Long id, final String email,
+    public JwtUserDetails(final String email,
                           final String fullName, final String password,
                           final Collection<?
                                   extends GrantedAuthority> authorities) {
-        this.id = id;
         this.email = email;
         this.fullName = fullName;
         this.password = password;
@@ -73,7 +67,6 @@ public class JwtUserDetails implements UserDetails {
                 .toList();
 
         return new JwtUserDetails(
-                user.getId(),
                 user.getEmail(),
                 user.getFullName(),
                 user.getPassword(),
