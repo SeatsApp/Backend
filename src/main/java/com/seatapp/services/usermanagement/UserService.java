@@ -54,60 +54,60 @@ public class UserService {
     /**
      * Login to the application.
      *
-     * @param username the full name of the user
-     * @param email    the email of the user
+     * @param email the email of the user
+     * @param fullName the full name of the user
      * @param password the unencoded password
      * @return a JWT token for the user to access the backend
      */
-    public String login(final String username, final String email,
+    public String login(final String email, final String fullName,
                         final String password) {
-        if (!existsByUsername(username)) {
-            createUser(username, email, password, passwordEncoder);
+        if (!existsByEmail(email)) {
+            createUser(email, fullName, password, passwordEncoder);
         }
-        Authentication authentication = authenticateUser(username, password);
+        Authentication authentication = authenticateUser(email, password);
         return jwtUtils.generateToken(authentication);
     }
 
     /**
      * Authenticate the user.
      *
-     * @param username the username of the user
+     * @param email the email of the user
      * @param password the unencoded password
      * @return a UsernamePasswordAuthenticationToken of the authenticated user.
      */
-    private Authentication authenticateUser(final String username,
+    private Authentication authenticateUser(final String email,
                                             final String password) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
+                new UsernamePasswordAuthenticationToken(email, password));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return authentication;
     }
 
     /**
-     * Check if the user with username exists.
+     * Check if the user with email exists.
      *
-     * @param username the username of the user
+     * @param email the email of the user
      * @return a boolean if the user exists
      */
-    public boolean existsByUsername(final String username) {
-        return userRepository.existsByUsername(username);
+    public boolean existsByEmail(final String email) {
+        return userRepository.existsByEmail(email);
     }
 
     /**
      * Creates a new User.
      *
-     * @param username the username of the new user
-     * @param email    the email of the new user
+     * @param email the email of the new user
+     * @param fullName the full name of the new user
      * @param password the unencoded password of the new user
      * @param encoder  the encoder with which the password will be encoded
      * @return the new user
      */
-    public User createUser(final String username,
-                           final String email,
+    public User createUser(final String email,
+                           final String fullName,
                            final String password,
                            final PasswordEncoder encoder) {
         return userRepository.save(
-                new User(username, email, encoder.encode(password)));
+                new User(email, fullName, encoder.encode(password)));
     }
 }

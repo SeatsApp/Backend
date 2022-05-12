@@ -75,10 +75,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 return;
             } else {
-                String username = jwtUtils.getUserNameFromJwtToken(jwt);
+                String email = jwtUtils.getEmailFromJwtToken(jwt);
 
                 UserDetails userDetails =
-                        userDetailsService.loadUserByUsername(username);
+                        userDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails, null,

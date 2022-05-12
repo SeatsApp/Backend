@@ -21,14 +21,14 @@ public class JwtUserDetails implements UserDetails {
     private final Long id;
 
     /**
-     * The username of the JWT user.
-     */
-    private final String username;
-
-    /**
      * The email of the JWT user.
      */
     private final String email;
+
+    /**
+     * The full name of the JWT user.
+     */
+    private final String fullName;
 
     /**
      * The password of the JWT user.
@@ -45,18 +45,18 @@ public class JwtUserDetails implements UserDetails {
      * Create the JwtUserDetails.
      *
      * @param id          the id from the user
-     * @param username    the username from the user
      * @param email       the email from the user
+     * @param fullName    the full name from the user
      * @param password    the encoded password from the user
      * @param authorities the role from the user
      */
-    public JwtUserDetails(final Long id, final String username,
-                          final String email, final String password,
+    public JwtUserDetails(final Long id, final String email,
+                          final String fullName, final String password,
                           final Collection<?
                                   extends GrantedAuthority> authorities) {
         this.id = id;
-        this.username = username;
         this.email = email;
+        this.fullName = fullName;
         this.password = password;
         this.authorities = authorities;
     }
@@ -74,8 +74,8 @@ public class JwtUserDetails implements UserDetails {
 
         return new JwtUserDetails(
                 user.getId(),
-                user.getUsername(),
                 user.getEmail(),
+                user.getFullName(),
                 user.getPassword(),
                 authorities);
     }
@@ -92,7 +92,7 @@ public class JwtUserDetails implements UserDetails {
 
     @Override
     public final String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

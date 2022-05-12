@@ -35,7 +35,7 @@ class UserServiceTest {
     @Test
     void createUserTest() {
         // Arrange
-        String username = "Thomas";
+        String fullName = "Thomas";
         String email = "test@hotmail.com";
         String password = "Test";
 
@@ -47,12 +47,12 @@ class UserServiceTest {
                 });
 
         // Act
-        User user = userService.createUser(username, email, password,
+        User user = userService.createUser(email, fullName, password,
                 passwordEncoder);
 
         // Assert
-        assertEquals(username, user.getUsername());
         assertEquals(email, user.getEmail());
+        assertEquals(fullName, user.getFullName());
         assertNotEquals(password, user.getPassword());
         assertEquals(1L, user.getId());
     }
@@ -60,18 +60,18 @@ class UserServiceTest {
     @Test
     void createUserAlreadyExistsTest() {
         // Arrange
-        String username = "Thomas";
+        String fullName = "Thomas";
         String email = "test@hotmail.com";
         String password = "Test";
 
-        userRepository.save(new User(username, email, password));
+        userRepository.save(new User(email, fullName, password));
         Mockito.when(userRepository.save(Mockito.any(User.class)))
                 .thenThrow(new IllegalArgumentException());
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class,
                 () -> {
-                    userService.createUser(username, email, password,
+                    userService.createUser(email, fullName, password,
                             passwordEncoder);
                 });
     }
