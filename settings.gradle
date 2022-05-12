@@ -6,3 +6,8 @@ pluginManagement {
 	}
 }
 rootProject.name = 'SeatApp'
+include 'core'
+include 'application'
+include 'adapters:incoming:rest'
+include 'adapters:outgoing:jpa'
+
