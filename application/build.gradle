@@ -1,0 +1,106 @@
+plugins {
+    // Spring
+    id 'org.springframework.boot' version '2.6.6'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+
+    // Sonarcloud
+    id "org.sonarqube" version "3.3"
+    id "argelbargel.gradle.plugins.sonarqube-multiproject-plugin" version "1.1"
+
+    // Jacoco for sending code coverage to Sonarcloud
+    id 'jacoco-report-aggregation'
+
+    id 'java'
+
+    //pmd
+    id 'pmd'
+
+    //checkstyle
+    id 'checkstyle'
+}
+
+group 'com'
+version '0.0.1-SNAPSHOT'
+sourceCompatibility = '18'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':core')
+    implementation project(':adapters:outgoing:jpa')
+    implementation project(':adapters:incoming:rest')
+
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // Checkstyle
+    implementation 'com.puppycrawl.tools:checkstyle:10.1'
+}
+
+// Azure AD
+ext {
+    set('springCloudAzureVersion', "4.0.0")
+}
+dependencyManagement {
+    imports {
+        mavenBom "com.azure.spring:spring-cloud-azure-dependencies:${springCloudAzureVersion}"
+    }
+}
+
+// Sonarcloud
+sonarqube {
+    properties {
+        property "sonar.projectBaseDir", "$rootDir"
+        property 'sonar.modules', 'core, adapters/incoming/rest, adapters/outgoing/jpa'
+        property "sonar.projectKey", "SeatsApp_Backend"
+        property "sonar.organization", "seatsapp"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml"
+
+        property "core.sonar.sources", "src/main/java"
+        property "core.sonar.java.binaries", "build/classes"
+
+        property "adapters/incoming/rest.sonar.sources", "src/main/java"
+        property "adapters/incoming/rest.sonar.java.binaries", "build/classes"
+
+        property "adapters/outgoing/jpa.sonar.sources", "src/main/java"
+        property "adapters/outgoing/jpa.sonar.java.binaries", "build/classes"
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+// Creating Jacoco test report
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+tasks.named("check"){
+    dependsOn tasks.named("testCodeCoverageReport", JacocoReport)
+}
+
+tasks.named('sonarqube').configure {
+    dependsOn check
+}
+
+//pmd
+pmd {
+    ruleSetConfig = rootProject.resources.text.fromFile('config/ruleset.xml')
+    ruleSets = []
+    ignoreFailures = false
+}
+
+// CheckStyle
+checkstyle {
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+    configProperties = [samedir: "${rootDir}"]
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

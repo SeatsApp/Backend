@@ -1,0 +1,106 @@
+plugins {
+    // Spring
+    id 'org.springframework.boot' version '2.6.6'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+
+    id 'java'
+
+    //pmd
+    id 'pmd'
+
+    // Jacoco for sonarcloud code coverage
+    id 'jacoco-report-aggregation'
+
+    //checkstyle
+    id 'checkstyle'
+}
+
+group 'com'
+version '0.0.1-SNAPSHOT'
+sourceCompatibility = '18'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':core')
+    testImplementation(project(":application"))
+    jacocoAggregation project(':application')
+
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Checkstyle
+    implementation 'com.puppycrawl.tools:checkstyle:10.1'
+
+    // H2 Database
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.h2database:h2'
+    implementation 'org.hibernate.validator:hibernate-validator:7.0.4.Final'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
+    //Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    // Spring Security Test
+    testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '5.6.3'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+// Azure AD
+ext {
+    set('springCloudAzureVersion', "4.0.0")
+}
+dependencyManagement {
+    imports {
+        mavenBom "com.azure.spring:spring-cloud-azure-dependencies:${springCloudAzureVersion}"
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+// Creating Jacoco test report
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+tasks.named("check"){
+    dependsOn tasks.named("testCodeCoverageReport", JacocoReport)
+}
+
+//pmd
+pmd {
+    ruleSetConfig = rootProject.resources.text.fromFile('config/ruleset.xml')
+    ruleSets = []
+    ignoreFailures = false
+}
+
+// CheckStyle
+checkstyle {
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+    configProperties = [samedir: "${rootDir}"]
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+

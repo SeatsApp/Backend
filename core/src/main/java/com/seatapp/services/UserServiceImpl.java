@@ -1,0 +1,119 @@
+package com.seatapp.services;
+
+import com.seatapp.domain.User;
+import com.seatapp.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class UserServiceImpl implements UserService {
+    /**
+     * Represents the user repository.
+     */
+    private final UserRepository userRepository;
+    /**
+     * Processes authentication requests.
+     */
+    private final AuthenticationManager authenticationManager;
+
+    /**
+     * Used for encoding the authentication password.
+     */
+    private final PasswordEncoder passwordEncoder;
+
+    /**
+     * Creates a user service with the following parameters.
+     *
+     * @param userRepository        the user repository
+     * @param authenticationManager the authentication manager
+     *                              to authenticate the logged in user
+     * @param passwordEncoder       the used encoder for encoding the passwords
+     */
+    @Autowired
+    public UserServiceImpl(final UserRepository userRepository,
+                           final AuthenticationManager authenticationManager,
+                           final PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * Login to the application.
+     *
+     * @param email    the email of the user
+     * @param fullName the full name of the user
+     * @param password the unencoded password
+     * @return the authentication of the user that logged in.
+     */
+    @Override
+    public Authentication login(final String email, final String fullName,
+                        final String password) {
+        if (!existsByEmail(email)) {
+            createUser(email, fullName, password, passwordEncoder);
+        }
+        return authenticateUser(email, password);
+    }
+
+    /**
+     * Authenticate the user.
+     *
+     * @param email    the email of the user
+     * @param password the unencoded password
+     * @return a UsernamePasswordAuthenticationToken of the authenticated user.
+     */
+    private Authentication authenticateUser(final String email,
+                                            final String password) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return authentication;
+    }
+
+    /**
+     * Check if the user with email exists.
+     *
+     * @param email the email of the user
+     * @return a boolean if the user exists
+     */
+    @Override
+    public boolean existsByEmail(final String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    /**
+     * Check if the user with username exists.
+     *
+     * @param email the email of the user
+     * @return a boolean if the user exists
+     */
+    @Override
+    public User getByEmail(final String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    /**
+     * Creates a new User.
+     *
+     * @param email    the email of the new user
+     * @param fullName the full name of the new user
+     * @param password the unencoded password of the new user
+     * @param encoder  the encoder with which the password will be encoded
+     * @return the new user
+     */
+    @Override
+    public User createUser(final String email,
+                           final String fullName,
+                           final String password,
+                           final PasswordEncoder encoder) {
+        return userRepository.save(
+                new User(email, fullName, encoder.encode(password)));
+    }
+}
