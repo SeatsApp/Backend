@@ -39,21 +39,27 @@ public class Seat {
      */
     @OneToMany(cascade = CascadeType.ALL)
     private List<Reservation> reservations;
+
     /**
      * Creates a seat with a specified name.
+     *
      * @param name The seats' name
      */
     public Seat(final String name) {
         this.name = name;
         this.reservations = new ArrayList<>();
     }
+
     /**
      * Adds a reservation to the list after checks.
+     *
      * @param newReservation the new reservation.
      */
     public void addReservation(final Reservation newReservation) {
         if (newReservation.isValidNewReservation(this.reservations)) {
             reservations.add(newReservation);
+        } else {
+            throw new IllegalArgumentException("The reservation is not valid");
         }
     }
 }

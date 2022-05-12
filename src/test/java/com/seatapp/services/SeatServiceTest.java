@@ -18,7 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class SeatServiceTest {
@@ -37,7 +39,7 @@ class SeatServiceTest {
     @Test
     void createSeatTest() {
         // Arrange
-        Mockito.when(seatRepository.save(Mockito.any(Seat.class)))
+        when(seatRepository.save(Mockito.any(Seat.class)))
                 .thenAnswer(i -> {
                     Seat seat = i.getArgument(0);
                     seat.setId(1L);
@@ -46,7 +48,7 @@ class SeatServiceTest {
 
         //Act
         Seat savedSeat = seatService.createSeat(
-                new SeatDto("Test"));
+                new SeatDto(1L, "Test", false));
 
         //Assert
         Seat expectedSeat = new Seat(1L, "Test",
@@ -74,28 +76,23 @@ class SeatServiceTest {
         Seat toBeDeletedSeat = new Seat("TestSeat");
         toBeDeletedSeat.setId(1L);
 
-        Mockito.when(seatRepository.findById(toBeDeletedSeat.getId()))
-                .thenReturn(java.util.Optional.of(toBeDeletedSeat));
+        when(seatRepository.findById(toBeDeletedSeat.getId()))
+                .thenReturn(java.util.Optional.of(toBeDeletedSeat))
+                .thenReturn(java.util.Optional.empty());
 
         // Act
-        Seat deletedSeat = seatService.delete(toBeDeletedSeat.getId());
+        seatService.delete(toBeDeletedSeat.getId());
 
         // Assert
-        assertEquals(toBeDeletedSeat.getId(), deletedSeat.getId());
-        assertEquals(toBeDeletedSeat.getName(), deletedSeat.getName());
+        assertNull(seatRepository.findById(toBeDeletedSeat.getId())
+                .orElse(null));
     }
 
     @Test
-    void deleteSeatWithNoValidId() {
-        // Arrange
-        Exception exception = assertThrows(EntityNotFoundException.class,
-                () -> seatService.delete(1L));
-
-        String expectedMessage = "No seat with this id.";
-        String actualMessage = exception.getMessage();
-
+    void deleteSeatWithInvalidId() {
         // Act & Assert
-        assertTrue(actualMessage.contains(expectedMessage));
+        assertThrows(EntityNotFoundException.class,
+                () -> seatService.delete(1L));
     }
 
     @Test
@@ -128,18 +125,5 @@ class SeatServiceTest {
         // Assert
         assertNotNull(seats);
         assertTrue(seats.isEmpty());
-    }
-
-    @Test
-    void reserveSeatTestWithNull() {
-        // Arrange
-        Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> seatService.reserve(1L, null));
-
-        String expectedMessage = "ReservationDto cannot be null";
-        String actualMessage = exception.getMessage();
-
-        // Act & Assert
-        assertTrue(actualMessage.contains(expectedMessage));
     }
 }

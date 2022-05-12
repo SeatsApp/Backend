@@ -50,16 +50,15 @@ public class SeatService {
      * Deletes the seat with the specified id.
      *
      * @param seatId the id of the to be deleted seat.
-     * @return the deleted seat.
      */
-    public Seat delete(final Long seatId) {
+    public void delete(final Long seatId) {
         Seat seat = getSeatById(seatId);
         seatRepository.delete(seat);
-        return seat;
     }
 
     /**
      * Gets all the seats from database.
+     *
      * @return a list of seats
      */
     public List<Seat> getAll() {
@@ -68,6 +67,7 @@ public class SeatService {
 
     /**
      * Gets a seat from database with the given id.
+     *
      * @param seatId the id of the seat.
      * @return a seat
      */
@@ -79,6 +79,7 @@ public class SeatService {
 
     /**
      * Reserves the seat with the specified id.
+     *
      * @param seatId         is the id of the to be reserved seat.
      * @param reservationDto is the reservation details.
      * @return the reserved seat.
@@ -98,12 +99,13 @@ public class SeatService {
 
     /**
      * Gets all the seats with their reservations from the given date.
+     *
      * @param date is the date of the wanted reservations.
      * @return the list of seats.
      */
     public List<Seat> getAllWithReservationsByDate(final LocalDate date) {
         List<Seat> foundSeats = getAll();
-        for (Seat s :foundSeats) {
+        for (Seat s : foundSeats) {
             s.setReservations(s.getReservations().stream()
                     .filter(reservation -> reservation.getDate().equals(date))
                     .collect(Collectors.toList()));

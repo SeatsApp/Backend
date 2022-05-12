@@ -76,10 +76,6 @@ class SeatControllerTest {
     private ObjectMapper objectMapper;
 
     /**
-     * Represents api url for createSeat.
-     */
-    private String createSeatUrl;
-    /**
      * Represents api url for /api/seats/.
      */
     private String apiSeatsUrl;
@@ -93,17 +89,17 @@ class SeatControllerTest {
      */
     @BeforeEach
     void setup() {
-        createSeatUrl = "/api/seat";
         apiSeatsUrl = "/api/seats/";
         reserveString = "/reserve";
+        seatRepository.deleteAll();
     }
 
     @Test
     @Transactional
     void createSeat() throws Exception {
-        SeatDto seatDto = new SeatDto("Test");
+        SeatDto seatDto = new SeatDto(1L, "Test", false);
 
-        mockMvc.perform(post(createSeatUrl)
+        mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper.writeValueAsString(seatDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -112,7 +108,7 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithNoName() throws Exception {
-        mockMvc.perform(post(createSeatUrl)
+        mockMvc.perform(post(apiSeatsUrl)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -120,9 +116,9 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithEmptyStringAsName() throws Exception {
-        SeatDto seatDto = new SeatDto("");
+        SeatDto seatDto = new SeatDto(1L, "", false);
 
-        mockMvc.perform(post(createSeatUrl)
+        mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper.writeValueAsString(seatDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -131,9 +127,9 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithNameNull() throws Exception {
-        SeatDto seatDto = new SeatDto(null);
+        SeatDto seatDto = new SeatDto(1L, null, false);
 
-        mockMvc.perform(post(createSeatUrl)
+        mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper.writeValueAsString(seatDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -142,7 +138,7 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithDtoBeingNull() throws Exception {
-        mockMvc.perform(post(createSeatUrl)
+        mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper.writeValueAsString(null))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -155,19 +151,14 @@ class SeatControllerTest {
         Seat toBeDeletedSeat = seatRepository.save(new Seat("TestSeat"));
 
         mockMvc.perform(delete(apiSeatsUrl + toBeDeletedSeat.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .string("Seat with id: " + toBeDeletedSeat.getId()
-                                + " is successfully removed."));
+                .andExpect(status().isOk());
     }
 
     @Test
     @Transactional
     void deleteSeatWithInValidId() throws Exception {
         mockMvc.perform(delete("/api/seats/1"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content()
-                        .string("No seat with this id."));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -212,10 +203,7 @@ class SeatControllerTest {
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .string("You reserved "
-                                + toBeReservedSeat.getName() + "."));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -233,9 +221,7 @@ class SeatControllerTest {
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content()
-                        .string("No seat with this id."));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -261,9 +247,7 @@ class SeatControllerTest {
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content()
-                        .string("Timeslot already booked."));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -294,9 +278,7 @@ class SeatControllerTest {
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content()
-                        .string("Timeslot already booked."));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -327,9 +309,7 @@ class SeatControllerTest {
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content()
-                        .string("Timeslot already booked."));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -360,9 +340,7 @@ class SeatControllerTest {
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content()
-                        .string("The end time can't be before start."));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -393,9 +371,7 @@ class SeatControllerTest {
                                 .writeValueAsString(reservationDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content()
-                        .string("Date can't be in the past."));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
