@@ -55,7 +55,7 @@ public class JwtUtils {
      * Generate a JWT token using the jwts builder.
      *
      * @param claims  the roles of the user
-     * @param subject the username of the user
+     * @param subject the email of the user
      * @return a JWT token
      */
     private String doGenerateToken(final Map<String, Object> claims,
@@ -69,12 +69,12 @@ public class JwtUtils {
     }
 
     /**
-     * Get username by JWT token.
+     * Get email by JWT token.
      *
      * @param token the JWT token
-     * @return the username from the JWT token
+     * @return the email from the JWT token
      */
-    public String getUserNameFromJwtToken(final String token) {
+    public String getEmailFromJwtToken(final String token) {
         return Jwts.parser().setSigningKey(jwtSecret)
                 .parseClaimsJws(token).getBody().getSubject();
     }

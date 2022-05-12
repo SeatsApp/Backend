@@ -38,7 +38,7 @@ class JwtUtilsTest {
         String jwt = jwtUtils.generateToken(authentication);
 
         // Assert
-        assertEquals(username, jwtUtils.getUserNameFromJwtToken(jwt));
+        assertEquals(username, jwtUtils.getEmailFromJwtToken(jwt));
     }
 
     @Test

@@ -91,7 +91,7 @@ class LoginControllerTest {
     }
 
     @Test
-    void nHealthCheckWithFilterWithoutToken() throws Exception {
+    void healthCheckWithFilterWithoutToken() throws Exception {
         // Arrange
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -113,7 +113,10 @@ class LoginControllerTest {
                         oauth2Login().oauth2User(new OAuth2User() {
                             @Override
                             public Map<String, Object> getAttributes() {
-                                return new HashMap<>();
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("preferred_username",
+                                        "thomas.vandewalle@cronos.be");
+                                return map;
                             }
 
                             @Override
@@ -140,7 +143,10 @@ class LoginControllerTest {
                         oauth2Login().oauth2User(new OAuth2User() {
                             @Override
                             public Map<String, Object> getAttributes() {
-                                return new HashMap<>();
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("preferred_username",
+                                        "thomas.vandewalle@cronos.be");
+                                return map;
                             }
 
                             @Override

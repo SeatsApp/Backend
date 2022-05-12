@@ -69,9 +69,11 @@ public class LoginController {
     public ResponseEntity<String> loginRedirectToWeb(
             @AuthenticationPrincipal final OAuth2User principal,
             final HttpServletResponse response) {
+        String fullName = principal.getName();
         String email = principal.getAttribute("preferred_username");
-        String jwt = userService.login(principal.getName(),
-                email, principal.getName());
+
+        String jwt = userService.login(email,
+                fullName, email);
         setCookieJSessionId(response);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} logged in on web and redirect",
@@ -94,8 +96,9 @@ public class LoginController {
             @AuthenticationPrincipal final OAuth2User principal,
             final HttpServletResponse response) {
         String email = principal.getAttribute("preferred_username");
-        String jwt = userService.login(principal.getName(),
-                email, principal.getName());
+        String fullName = principal.getName();
+        String jwt = userService.login(email,
+                fullName, principal.getName());
         setCookieJSessionId(response);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} logged in on expo and redirect",

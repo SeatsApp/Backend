@@ -24,9 +24,9 @@ public class User {
     private Long id;
 
     /**
-     * The username of the user.
+     * The email of the user.
      */
-    private String username;
+    private String email;
 
     /**
      * The encoded password of the user.
@@ -34,9 +34,9 @@ public class User {
     private String password;
 
     /**
-     * The email of the user.
+     * The full name of the user.
      */
-    private String email;
+    private String fullName;
 
     /**
      * The role of the user.
@@ -46,15 +46,15 @@ public class User {
     /**
      * Creates a user.
      *
-     * @param username the username of the user
      * @param email the email of the user
+     * @param fullName the full name of the user
      * @param password the password of the user
      */
-    public User(final String username, final String email,
+    public User(final String email, final String fullName,
                 final String password) {
-        this.username = username;
-        this.password = password;
         this.email = email;
+        this.password = password;
+        this.fullName = fullName;
         this.role = "Admin";
     }
 }

@@ -30,19 +30,19 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
 
     /**
-     * Load the user from the repository by username.
+     * Load the user from the repository by email.
      *
-     * @param username the username of the user that
+     * @param email the email of the user that
      *                 you want to load
      * @return the found UserDetails
      */
     @SneakyThrows
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(final String username) {
-        User user = userRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(final String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "User Not Found with username: " + username));
+                        "User Not Found with email: " + email));
 
         return JwtUserDetails.build(user);
     }
