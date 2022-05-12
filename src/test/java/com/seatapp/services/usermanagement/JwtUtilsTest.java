@@ -31,7 +31,7 @@ class JwtUtilsTest {
                 Mockito.spy(new UsernamePasswordAuthenticationToken(username,
                         password));
         Mockito.when(authentication.getPrincipal())
-                .thenReturn(new JwtUserDetails(1L, username, email, password,
+                .thenReturn(new JwtUserDetails(username, email, password,
                         new ArrayList<>()));
 
         // Act

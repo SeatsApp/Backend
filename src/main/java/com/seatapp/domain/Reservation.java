@@ -1,12 +1,16 @@
 package com.seatapp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.seatapp.domain.usermanagement.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,18 +37,34 @@ public class Reservation {
      * Represents the date of a reservation.
      */
     private LocalDate date;
+    /**
+     * Represents if reservation is checked in.
+     */
+    private boolean checkedIn;
+    /**
+     * Represents the user who placed the reservation.
+     */
+    @ManyToOne
+    @JoinColumn(name = "username")
+    @JsonIgnore
+    private User user;
+
 
     /**
      * Creates reservation with the details.
      *
      * @param startTime start time of the reservation.
      * @param endTime   end time of the reservation.
+     * @param user the user who made the reservation.
      */
     public Reservation(final LocalDateTime startTime,
-                       final LocalDateTime endTime) {
+                       final LocalDateTime endTime,
+                       final User user) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.date = startTime.toLocalDate();
+        this.checkedIn = false;
+        this.user = user;
     }
 
     /**
@@ -131,5 +151,22 @@ public class Reservation {
      */
     public boolean checkIfDateIsAfterNow(final LocalDateTime startTimeNew) {
         return startTimeNew.isAfter(LocalDateTime.now());
+    }
+
+    /**
+     * Changes the checked in status of a reservation.
+     * @param username username of the person
+     *                wanting to check in.
+     */
+    public void checkIn(final String username) {
+        if (isCheckedIn()) {
+            throw new IllegalArgumentException(
+                    "This reservation is already checked in.");
+        }
+        if (!username.equals(user.getEmail())) {
+            throw new IllegalArgumentException(
+                    "You didn't reserve this seat for this timeslot.");
+        }
+        this.checkedIn = true;
     }
 }

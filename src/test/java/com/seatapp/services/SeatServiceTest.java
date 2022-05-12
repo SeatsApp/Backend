@@ -1,7 +1,9 @@
 package com.seatapp.services;
 
 import com.seatapp.controllers.dtos.SeatDto;
+import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Seat;
+import com.seatapp.domain.usermanagement.User;
 import com.seatapp.repositories.SeatRepository;
 import org.junit.jupiter.api.Test;
 
@@ -11,14 +13,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +39,14 @@ class SeatServiceTest {
     @Autowired
     private SeatService seatService;
 
+    /**
+     * Username used in the tests.
+     */
+    private static final User VALID_USER =
+            new User("User1",
+                    "User@Test.be",
+                    "User1");
+
     @Test
     void createSeatTest() {
         // Arrange
@@ -48,7 +59,7 @@ class SeatServiceTest {
 
         //Act
         Seat savedSeat = seatService.createSeat(
-                new SeatDto(1L, "Test", false));
+                new SeatDto(1L, "Test"));
 
         //Assert
         Seat expectedSeat = new Seat(1L, "Test",
@@ -125,5 +136,65 @@ class SeatServiceTest {
         // Assert
         assertNotNull(seats);
         assertTrue(seats.isEmpty());
+    }
+
+    @Test
+    void reserveSeatTestWithNull() {
+        // Arrange
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> seatService.reserve(1L, null,
+                        VALID_USER));
+
+        String expectedMessage = "ReservationDto cannot be null";
+        String actualMessage = exception.getMessage();
+
+        // Act & Assert
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void checkInSeat() {
+        //given
+        Seat seat = new Seat("Seat1");
+        seat.setId(1L);
+        seat.getReservations().add(new Reservation(
+                LocalDateTime.now(), LocalDateTime.now().plusHours(1),
+                VALID_USER));
+
+        given(seatRepository.findById(
+                seat.getId())).willReturn(java.util.Optional.of(seat));
+
+        //act
+        seatService.checkInOnSeat(seat.getId(), VALID_USER.getEmail());
+
+        //assert
+        assertTrue(seat.getReservations().get(0).isCheckedIn());
+    }
+
+    @Test
+    void checkInSeatOnWrongTime() {
+        //given
+        Seat seat = new Seat("Seat1");
+        seat.setId(1L);
+        seat.getReservations().add(new Reservation(
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2), VALID_USER));
+
+        given(seatRepository.findById(seat.getId()))
+                .willReturn(java.util.Optional.of(seat));
+
+        String username = VALID_USER.getEmail();
+        Long seatId = seat.getId();
+
+        //assert
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> seatService.checkInOnSeat(seatId,
+                        username));
+
+        String expectedMessage = "You can't check in before the start"
+                + " time or after the end time.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 }

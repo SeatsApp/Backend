@@ -2,6 +2,7 @@ package com.seatapp.services;
 
 import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Seat;
+import com.seatapp.domain.usermanagement.User;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +38,13 @@ class SeatTests {
      * An hour used in the tests.
      */
     private static final int DATE_HOUR16 = 16;
+    /**
+     * Username used in the tests.
+     */
+    private static final User VALID_USER =
+            new User("User1",
+                    "User@Test.be",
+                    "User1");
 
     @Test
     void addReservationTestPassed() {
@@ -46,7 +54,7 @@ class SeatTests {
         LocalDateTime endTimeExisting = LocalDateTime.of(DATE_YEAR_FUTURE,
                 DATE_MONTH, DATE_DAY, DATE_HOUR15, 0, 0);
         seat.getReservations().add(new Reservation(startTimeExisting,
-                endTimeExisting));
+                endTimeExisting, VALID_USER));
 
         LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR_FUTURE,
                 DATE_MONTH, DATE_DAY, DATE_HOUR15, 0, 0);
@@ -54,7 +62,7 @@ class SeatTests {
                 DATE_MONTH, DATE_DAY, DATE_HOUR16, 0, 0);
 
         seat.addReservation(new Reservation(startTimeNew,
-                endTimeNew));
+                endTimeNew, VALID_USER));
 
         assertEquals(2, seat.getReservations().size());
         assertEquals("2024-04-27", seat.getReservations()
@@ -69,13 +77,15 @@ class SeatTests {
         LocalDateTime endTimeExisting = LocalDateTime.of(DATE_YEAR_FUTURE,
                 DATE_MONTH, DATE_DAY, DATE_HOUR15, 0, 0);
         seat.getReservations().add(
-                new Reservation(startTimeExisting, endTimeExisting));
+                new Reservation(startTimeExisting, endTimeExisting,
+                        VALID_USER));
 
         LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR_FUTURE,
                 DATE_MONTH, DATE_DAY, DATE_HOUR13, 0, 0);
         LocalDateTime endTimeNew = LocalDateTime.of(DATE_YEAR_FUTURE,
                 DATE_MONTH, DATE_DAY, DATE_HOUR16, 0, 0);
-        Reservation newReservation = new Reservation(startTimeNew, endTimeNew);
+        Reservation newReservation = new Reservation(startTimeNew, endTimeNew,
+                VALID_USER);
 
         assertThrows(IllegalArgumentException.class,
                 () -> seat.addReservation(newReservation));

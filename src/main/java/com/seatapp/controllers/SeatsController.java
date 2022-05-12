@@ -3,11 +3,13 @@ package com.seatapp.controllers;
 import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
 import com.seatapp.domain.Seat;
+import com.seatapp.domain.usermanagement.User;
 import com.seatapp.services.SeatService;
+import com.seatapp.services.usermanagement.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,21 +29,29 @@ import java.util.List;
  */
 @CrossOrigin(origins = "http://localhost:19006", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/seats")
+@RequestMapping("/api/seats/")
 public class SeatsController {
     /**
-     * Represents the service that is called.
+     * Represents the seat service that is called.
      */
     private final SeatService seatService;
+
+    /**
+     * Represents the user service that is called.
+     */
+    private final UserService userService;
 
     /**
      * Creates the controller with a specified service.
      *
      * @param seatService the seatService
+     * @param userService the userService
      */
     @Autowired
-    public SeatsController(final SeatService seatService) {
+    public SeatsController(final SeatService seatService,
+                           final UserService userService) {
         this.seatService = seatService;
+        this.userService = userService;
     }
 
     /**
@@ -102,14 +112,40 @@ public class SeatsController {
      *
      * @param seatId         the Id of the to be reserved seat.
      * @param reservationDto the reservation details.
+     * @param token          the authentication information.
      * @return Returns a response with the HttpStatus and a message.
      */
     @PatchMapping("{seatId}/reserve")
-    public ResponseEntity<String> reserveSeat(@PathVariable final Long seatId,
-                                              @RequestBody final
-                                              ReservationDto reservationDto) {
-        Seat reservedSeat = seatService.reserve(seatId, reservationDto);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("You reserved " + reservedSeat.getName() + ".");
+    public ResponseEntity<String>
+    reserveSeat(@PathVariable final Long seatId,
+                @RequestBody final
+                ReservationDto reservationDto,
+                final
+                UsernamePasswordAuthenticationToken
+                        token) {
+        User user = userService.getByEmail(token.getName());
+        seatService.reserve(seatId, reservationDto, user);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Checks in on an existing seat.
+     *
+     * @param seatId the Id of the to be checked in seat.
+     * @param token  the authentication information.
+     * @return Returns a response with the HttpStatus and a message.
+     */
+    @PatchMapping("{seatId}/checkIn")
+    public ResponseEntity<String> checkIn(@PathVariable final Long seatId,
+                                          final
+                                          UsernamePasswordAuthenticationToken
+                                                  token) {
+        if (userService.existsByEmail(token.getName())) {
+            seatService
+                    .checkInOnSeat(seatId, token.getName());
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

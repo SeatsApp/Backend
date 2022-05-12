@@ -16,10 +16,6 @@ public class SeatDto {
      * Represents the seats' name.
      */
     private String name;
-    /**
-     * Represents the seats' reservation status.
-     */
-    private boolean reserved;
 
     /**
      * Creates an seatdto with a name.

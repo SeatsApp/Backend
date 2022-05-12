@@ -10,6 +10,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 public class UserService {
     /**
@@ -92,6 +94,18 @@ public class UserService {
      */
     public boolean existsByEmail(final String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    /**
+     * Check if the user with username exists.
+     *
+     * @param email the email of the user
+     * @return a boolean if the user exists
+     */
+    public User getByEmail(final String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "This user doesn't exist."));
     }
 
     /**
