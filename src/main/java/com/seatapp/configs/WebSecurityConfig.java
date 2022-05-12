@@ -1,8 +1,8 @@
 package com.seatapp.configs;
 
 import com.seatapp.filters.JwtAuthorizationFilter;
-import com.seatapp.services.usermanagement.JwtUtils;
-import com.seatapp.services.usermanagement.JwtUserDetailsService;
+import com.seatapp.services.usermanagement.JwtServiceImpl;
+import com.seatapp.services.usermanagement.JwtUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,20 +28,20 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * The service to handle the login with the JWT token.
      */
-    private final JwtUserDetailsService userDetailsService;
+    private final JwtUserDetailsServiceImpl userDetailsService;
     /**
      * The service to authenticate the JWT token.
      */
-    private final JwtUtils jwtUtils;
+    private final JwtServiceImpl jwtServiceImpl;
 
     @Autowired
-    WebSecurityConfig(final JwtUserDetailsService userDetailsService,
+    WebSecurityConfig(final JwtUserDetailsServiceImpl userDetailsService,
                       final OAuth2UserService<OidcUserRequest,
                               OidcUser> oidcUserService,
-                      final JwtUtils jwtUtils) {
+                      final JwtServiceImpl jwtServiceImpl) {
         this.userDetailsService = userDetailsService;
         this.oidcUserService = oidcUserService;
-        this.jwtUtils = jwtUtils;
+        this.jwtServiceImpl = jwtServiceImpl;
     }
 
     @Override
@@ -68,7 +68,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(),
-                        jwtUtils,
+                        jwtServiceImpl,
                         userDetailsService, "/api/login/", "/actuator/"))
                 .authorizeRequests()
                 .antMatchers("/api/login/**").authenticated()

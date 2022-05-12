@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.seatapp.domain.usermanagement.JwtUserDetails;
 import com.seatapp.services.LoggerService;
+import com.seatapp.services.LoggerServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.Jwts;
 
 @Component
-public class JwtUtils {
+public class JwtServiceImpl implements JwtService {
     /**
      * The JWT secret.
      */
@@ -35,7 +36,7 @@ public class JwtUtils {
      * The logger for JwtUtils.
      */
     private final LoggerService loggerService =
-            new LoggerService(getClass());
+            new LoggerServiceImpl(getClass());
 
     /**
      * Generates a JWT token.
@@ -44,6 +45,7 @@ public class JwtUtils {
      *                       the JWT will be gennerated
      * @return a JWT token
      */
+    @Override
     public String generateToken(final Authentication authentication) {
         JwtUserDetails userPrincipal =
                 (JwtUserDetails) authentication.getPrincipal();
@@ -74,6 +76,7 @@ public class JwtUtils {
      * @param token the JWT token
      * @return the email from the JWT token
      */
+    @Override
     public String getEmailFromJwtToken(final String token) {
         return Jwts.parser().setSigningKey(jwtSecret)
                 .parseClaimsJws(token).getBody().getSubject();
@@ -85,6 +88,7 @@ public class JwtUtils {
      * @param token the JWT token
      * @return if the JWT token is validated
      */
+    @Override
     public boolean validateJwtToken(final String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);

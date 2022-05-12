@@ -1,25 +1,21 @@
 package com.seatapp.repositories.usermanagement;
 
 import com.seatapp.domain.usermanagement.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface UserRepository {
-    /**
-     * Saves the user in the database.
-     *
-     * @param user the user that will be saved
-     *             in the database
-     * @return the saved user in the database
-     */
-    User save(User user);
-
+@Repository
+public interface UserRepositoryImpl extends
+        JpaRepository<User, Long>, UserRepository {
     /**
      * Finds the user by email.
      *
      * @param email the email to search the user
      * @return the optional user
      */
+    @Override
     Optional<User> findByEmail(String email);
 
     /**
@@ -28,5 +24,6 @@ public interface UserRepository {
      * @param email the email to search the user
      * @return a boolean to check if the user exists
      */
+    @Override
     Boolean existsByEmail(String email);
 }
