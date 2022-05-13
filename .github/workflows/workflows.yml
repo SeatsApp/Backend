@@ -100,6 +100,9 @@ jobs:
         run: |
           ./gradlew build
       - name: Release to Amazon Lightsail
+        env:
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           echo "Releasing to Amazon Lightsail"
 
@@ -123,6 +126,10 @@ jobs:
           --containers "{
           \"${{ env.SERVICE_NAME }}\": {
             \"image\": \"$IMAGE_TAG\",
+            \"environment\": {
+              \"AZURE_CLIENT_SECRET\": \"${{ env.AZURE_CLIENT_SECRET }}\",
+              \"JWT_SECRET\": \"${{ env.JWT_SECRET }}\"
+              },
             \"ports\": {
               \"8080\": \"HTTP\"
               }
@@ -133,6 +140,7 @@ jobs:
               \"containerPort\": 8080,
               \"healthCheck\": {
                 \"path\": \"/actuator/health\",
-                \"intervalSeconds\": 60
+                \"timeoutSeconds\": 60,
+                \"intervalSeconds\": 120
               }
           }"

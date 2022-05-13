@@ -80,7 +80,8 @@ public class LoginController {
                     principal.getName());
         }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("http://localhost:19006?JWT=" + jwt))
+                .location(URI.create("http://xplore-seatapp.s3-website"
+                        + "-eu-west-1.amazonaws.com/?JWT=" + jwt))
                 .build();
     }
 
