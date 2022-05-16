@@ -38,7 +38,7 @@ public class SeatAppApplication {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of("http://localhost:19006",
-                "https://5b27-94-143-189-241.eu.ngrok.io"));
+                "http://xplore-seatapp.s3-website-eu-west-1.amazonaws.com"));
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
         source.registerCorsConfiguration("/**", config);

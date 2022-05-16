@@ -29,7 +29,7 @@ import java.util.List;
  */
 @CrossOrigin(origins = "http://localhost:19006", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/seats/")
+@RequestMapping("/api/seats")
 public class SeatsController {
     /**
      * Represents the seat service that is called.
