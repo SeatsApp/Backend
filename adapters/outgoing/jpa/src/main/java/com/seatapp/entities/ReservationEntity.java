@@ -16,8 +16,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Reservation")
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class ReservationEntity {
     /**
      * Represents the reservations' id.
@@ -44,15 +46,16 @@ public class ReservationEntity {
     /**
      * Represents the user who placed the reservation.
      */
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST,
+            CascadeType.REFRESH})
     private UserEntity userEntity;
 
     /**
      * Creates reservation with the details.
      *
-     * @param id id of the reservation.
-     * @param startTime start time of the reservation.
-     * @param endTime   end time of the reservation.
+     * @param id         id of the reservation.
+     * @param startTime  start time of the reservation.
+     * @param endTime    end time of the reservation.
      * @param userEntity the user who made the reservation.
      * @param checkedIn  if the reservation is checkedIn or not.
      */

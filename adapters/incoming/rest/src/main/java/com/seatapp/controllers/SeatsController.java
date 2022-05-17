@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This is an api to create, read and delete seats.
@@ -97,16 +98,23 @@ public class SeatsController {
     /**
      * Takes all the seats from the database with the
      * reservations from the given date.
+     *
      * @param date the date where you want reservations from.
      * @return Returns a responseEntity with the HttpStatus and the found seats.
      */
     @GetMapping("reservations/date/{date}")
-    public ResponseEntity<List<Seat>> getSeatsWithReservationsByDate(
-             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-             @PathVariable final LocalDate date) {
+    public ResponseEntity<List<SeatDto>> getSeatsWithReservationsByDate(
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @PathVariable final LocalDate date) {
         List<Seat> foundSeats = seatService
                 .getAllWithReservationsByDate(date);
-        return ResponseEntity.ok(foundSeats);
+
+        List<SeatDto> seatDtos = foundSeats.stream()
+                .map(seat -> SeatDto.build(seat,
+                        date.atTime(0, 0),
+                        date.plusDays(1).atTime(0, 0)))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(seatDtos);
     }
 
     /**
@@ -127,8 +135,8 @@ public class SeatsController {
                         token) {
         User user = userService.getByEmail(token.getName());
         Reservation reservation = new Reservation(
-                reservationDto.getStartTime(),
-                reservationDto.getEndTime(),
+                reservationDto.getStartDateTime(),
+                reservationDto.getEndDateTime(),
                 user);
         seatService.reserve(seatId, reservation);
         return ResponseEntity.ok().build();

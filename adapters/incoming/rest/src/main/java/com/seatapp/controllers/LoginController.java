@@ -92,8 +92,7 @@ public class LoginController {
                     principal.getName());
         }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("http://xplore-seatapp.s3-website"
-                        + "-eu-west-1.amazonaws.com/?JWT=" + jwt))
+                .location(URI.create("http://localhost:19006/?JWT=" + jwt))
                 .build();
     }
 
@@ -119,7 +118,7 @@ public class LoginController {
                     principal.getName());
         }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("exp://10.150.196.33:19000?JWT="
+                .location(URI.create("exp://10.0.2.2:19000?JWT="
                         + jwt)).build();
     }
 
