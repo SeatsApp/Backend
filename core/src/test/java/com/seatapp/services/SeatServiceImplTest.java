@@ -1,6 +1,7 @@
 package com.seatapp.services;
 
 import com.seatapp.domain.Reservation;
+import com.seatapp.domain.Role;
 import com.seatapp.domain.Seat;
 import com.seatapp.domain.User;
 import com.seatapp.exceptions.EntityNotFoundException;
@@ -65,7 +66,7 @@ class SeatServiceImplTest {
     private static final User VALID_USER =
             new User("User1",
                     "User@Test.be",
-                    "User1");
+                    "User1", Role.ADMIN);
 
     @Test
     void createSeatTest() {

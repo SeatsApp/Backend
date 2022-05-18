@@ -1,5 +1,6 @@
 package com.seatapp.services;
 
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import com.seatapp.repositories.UserRepository;
 import com.seatapp.usermanagement.services.LoginServiceImpl;
@@ -52,7 +53,7 @@ class LoginServiceTest {
 
         // Act
         Authentication receivedAuthentication =
-                loginService.login(email, fullName, password);
+                loginService.login(email, fullName, password, Role.ADMIN);
 
         // Assert
         assertEquals(email, receivedAuthentication.getName());
@@ -75,7 +76,7 @@ class LoginServiceTest {
 
         // Act
         Authentication receivedAuthentication =
-                loginService.login(email, fullName, password);
+                loginService.login(email, fullName, password, Role.ADMIN);
 
         // Assert
         assertEquals(email, receivedAuthentication.getName());

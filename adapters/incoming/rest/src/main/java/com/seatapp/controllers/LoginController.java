@@ -82,8 +82,8 @@ public class LoginController {
             final HttpServletResponse response) {
         String fullName = principal.getName();
         String email = principal.getAttribute("preferred_username");
-        Role role = principal.getAuthorities()
-                .toArray()[0].equals("APPROLE_Admin")
+        Role role = "APPROLE_Admin".equals(principal.getAuthorities()
+                .toArray()[0].toString())
                 ? Role.ADMIN : Role.USER;
 
         Authentication authentication = loginService.login(email,
@@ -113,8 +113,8 @@ public class LoginController {
             final HttpServletResponse response) {
         String email = principal.getAttribute("preferred_username");
         String fullName = principal.getName();
-        Role role = principal.getAuthorities().toArray()[0]
-                .equals("APPROLE_Admin") ? Role.ADMIN : Role.USER;
+        Role role = "APPROLE_Admin".equals(principal.getAuthorities()
+                .toArray()[0].toString()) ? Role.ADMIN : Role.USER;
 
         Authentication authentication = loginService.login(email,
                 fullName, email, role);

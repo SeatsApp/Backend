@@ -26,6 +26,7 @@ public interface UserService {
      * @param email the email of the new user
      * @param fullName the full name of the new user
      * @param password the unencoded password of the new user
+     * @param role the role of the user.
      * @return the new user
      */
      User createUser(String email,

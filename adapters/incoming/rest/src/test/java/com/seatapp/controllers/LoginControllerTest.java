@@ -3,7 +3,6 @@ package com.seatapp.controllers;
 import com.seatapp.domain.User;
 import com.seatapp.repositories.UserRepository;
 import com.seatapp.usermanagement.services.JwtService;
-import com.seatapp.usermanagement.services.LoginService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.security.web.FilterChainProxy;
@@ -19,10 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -63,12 +63,6 @@ class LoginControllerTest {
      */
     @MockBean(name = "userRepositoryImpl")
     private UserRepository userRepository;
-
-    /**
-     * Represents the mocked user service.
-     */
-    @MockBean
-    private LoginService loginService;
 
     @Test
     void healthCheckWithFilter() throws Exception {
@@ -123,12 +117,6 @@ class LoginControllerTest {
 
     @Test
     void loginWeb() throws Exception {
-        String email = "thomas.vandewalle@cronos.be";
-        when(loginService.login(email, "Thomas",
-                email))
-                .thenReturn(new UsernamePasswordAuthenticationToken(
-                        email, email));
-
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .addFilter(springSecurityFilterChain).build();
 
@@ -145,7 +133,9 @@ class LoginControllerTest {
                             @Override
                             public Collection<? extends GrantedAuthority>
                             getAuthorities() {
-                                return new ArrayList<>();
+                                return List.of(
+                                        new SimpleGrantedAuthority(
+                                                "APPROLE_Admin"));
                             }
 
                             @Override
@@ -158,12 +148,6 @@ class LoginControllerTest {
 
     @Test
     void loginExpo() throws Exception {
-        String email = "thomas.vandewalle@cronos.be";
-        when(loginService.login(email, "Thomas",
-                email))
-                .thenReturn(
-                        new UsernamePasswordAuthenticationToken(email, email));
-
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .addFilter(springSecurityFilterChain).build();
 
@@ -180,7 +164,9 @@ class LoginControllerTest {
                             @Override
                             public Collection<? extends GrantedAuthority>
                             getAuthorities() {
-                                return new ArrayList<>();
+                                return List.of(
+                                        new SimpleGrantedAuthority(
+                                                "APPROLE_Admin"));
                             }
 
                             @Override

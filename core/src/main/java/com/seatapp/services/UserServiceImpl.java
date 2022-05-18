@@ -52,6 +52,7 @@ public class UserServiceImpl implements UserService {
      * @param email    the email of the new user
      * @param fullName the full name of the new user
      * @param password the unencoded password of the new user
+     * @param role the role of the new user
      * @return the new user
      */
     @Override

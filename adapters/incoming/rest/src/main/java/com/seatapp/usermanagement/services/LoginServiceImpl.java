@@ -49,6 +49,7 @@ public class LoginServiceImpl implements LoginService {
      * @param email    the email of the user
      * @param fullName the full name of the user
      * @param password the unencoded password
+     * @param role the role of the user
      * @return the authentication of the user that logged in.
      */
     @Override
