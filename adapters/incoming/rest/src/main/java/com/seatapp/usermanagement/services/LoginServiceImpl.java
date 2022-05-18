@@ -1,5 +1,6 @@
 package com.seatapp.usermanagement.services;
 
+import com.seatapp.domain.Role;
 import com.seatapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,14 +49,15 @@ public class LoginServiceImpl implements LoginService {
      * @param email    the email of the user
      * @param fullName the full name of the user
      * @param password the unencoded password
+     * @param role the role of the user
      * @return the authentication of the user that logged in.
      */
     @Override
     public Authentication login(final String email, final String fullName,
-                                final String password) {
+                                final String password, final Role role) {
         if (!userService.existsByEmail(email)) {
             userService.createUser(email, fullName,
-                    passwordEncoder.encode(password));
+                    passwordEncoder.encode(password), role);
         }
         return authenticateUser(email, password);
     }

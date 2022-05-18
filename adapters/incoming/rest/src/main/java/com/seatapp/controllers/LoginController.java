@@ -1,5 +1,6 @@
 package com.seatapp.controllers;
 
+import com.seatapp.domain.Role;
 import com.seatapp.usermanagement.services.JwtService;
 import com.seatapp.usermanagement.services.LoginService;
 import org.slf4j.Logger;
@@ -81,9 +82,12 @@ public class LoginController {
             final HttpServletResponse response) {
         String fullName = principal.getName();
         String email = principal.getAttribute("preferred_username");
+        Role role = "APPROLE_Admin".equals(principal.getAuthorities()
+                .toArray()[0].toString())
+                ? Role.ADMIN : Role.USER;
 
         Authentication authentication = loginService.login(email,
-                fullName, email);
+                fullName, email, role);
         String jwt = jwtService.generateToken(authentication);
 
         setCookieJSessionId(response);
@@ -92,8 +96,7 @@ public class LoginController {
                     principal.getName());
         }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("http://xplore-seatapp.s3-website"
-                        + "-eu-west-1.amazonaws.com/?JWT=" + jwt))
+                .location(URI.create("http://localhost:19006?JWT=" + jwt))
                 .build();
     }
 
@@ -110,8 +113,11 @@ public class LoginController {
             final HttpServletResponse response) {
         String email = principal.getAttribute("preferred_username");
         String fullName = principal.getName();
+        Role role = "APPROLE_Admin".equals(principal.getAuthorities()
+                .toArray()[0].toString()) ? Role.ADMIN : Role.USER;
+
         Authentication authentication = loginService.login(email,
-                fullName, email);
+                fullName, email, role);
         String jwt = jwtService.generateToken(authentication);
         setCookieJSessionId(response);
         if (LOGGER.isDebugEnabled()) {

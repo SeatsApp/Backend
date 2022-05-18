@@ -1,5 +1,6 @@
 package com.seatapp.services;
 
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import com.seatapp.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -32,13 +33,14 @@ class UserServiceImplTest {
         String email = "test@hotmail.com";
         String password = "Test";
 
-        userRepository.save(new User(email, fullName, password));
+        userRepository.save(new User(email, password, fullName,  Role.ADMIN));
         when(userRepository.save(Mockito.any(User.class)))
                 .thenThrow(new IllegalArgumentException());
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class,
-                () -> userService.createUser(email, fullName, password));
+                () -> userService.createUser(email, fullName,
+                        password, Role.ADMIN));
     }
 
     @Test
@@ -51,7 +53,7 @@ class UserServiceImplTest {
         when(userRepository.save(Mockito.any(User.class)))
                 .thenAnswer(i -> i.<User>getArgument(0));
         when(userRepository.findByEmail(email))
-                .thenReturn(new User(email, fullName, password));
+                .thenReturn(new User(email, password, fullName, Role.ADMIN));
 
         // Act
         User user = userService.getByEmail(email);

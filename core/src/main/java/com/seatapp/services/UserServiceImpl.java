@@ -1,5 +1,6 @@
 package com.seatapp.services;
 
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import com.seatapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +52,15 @@ public class UserServiceImpl implements UserService {
      * @param email    the email of the new user
      * @param fullName the full name of the new user
      * @param password the unencoded password of the new user
+     * @param role the role of the new user
      * @return the new user
      */
     @Override
     public User createUser(final String email,
                            final String fullName,
-                           final String password) {
+                           final String password,
+                           final Role role) {
         return userRepository.save(
-                new User(email, fullName, password));
+                new User(email, password, fullName, role));
     }
 }

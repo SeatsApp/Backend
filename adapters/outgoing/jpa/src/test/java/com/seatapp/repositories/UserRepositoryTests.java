@@ -1,5 +1,6 @@
 package com.seatapp.repositories;
 
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import com.seatapp.exceptions.EntityNotFoundException;
 import com.seatapp.services.usermanagement.UserRepositoryImpl;
@@ -19,7 +20,7 @@ class UserRepositoryTests {
      * A seat object used in testing.
      */
     private static final User VALID_USER = new User("Test@test.be",
-            "TestUser", "");
+            "TestUser", "TestUser", Role.ADMIN);
 
     /**
      * The userRepositoryImplementation.

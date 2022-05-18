@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
 import com.seatapp.domain.Reservation;
+import com.seatapp.domain.Role;
 import com.seatapp.domain.Seat;
 import com.seatapp.domain.User;
 import com.seatapp.repositories.UserRepository;
@@ -80,7 +81,7 @@ class SeatControllerTest {
     private static final User VALID_USER =
             new User("User@Test.be",
                     "User1",
-                    "User1");
+                    "User1", Role.ADMIN);
 
     /**
      * jwt token used in the tests.
@@ -179,7 +180,7 @@ class SeatControllerTest {
         jwt = jwtService.generateToken(authentication);
 
         User user = new User(VALID_USER.getEmail(), VALID_USER.getEmail(),
-                VALID_USER.getEmail());
+                VALID_USER.getEmail(), VALID_USER.getRole());
 
         when(userService.getByEmail(VALID_USER.getEmail())).thenReturn(user);
         when(userRepository.findByEmail(VALID_USER.getEmail()))

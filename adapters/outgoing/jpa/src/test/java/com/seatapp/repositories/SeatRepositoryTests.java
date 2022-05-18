@@ -2,6 +2,7 @@ package com.seatapp.repositories;
 
 import com.seatapp.SeatRepositoryImpl;
 import com.seatapp.domain.Reservation;
+import com.seatapp.domain.Role;
 import com.seatapp.domain.Seat;
 import com.seatapp.domain.User;
 import com.seatapp.exceptions.EntityNotFoundException;
@@ -27,7 +28,7 @@ class SeatRepositoryTests {
                     List.of(new Reservation(LocalDateTime.now(),
                             LocalDateTime.now().plusHours(2),
                             new User("test", "test",
-                                    "test")))));
+                                    "test", Role.ADMIN)))));
 
     /**
      * The seatRepositoryImplementation.

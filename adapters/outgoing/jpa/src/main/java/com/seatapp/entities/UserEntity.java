@@ -1,5 +1,6 @@
 package com.seatapp.entities;
 
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,23 +35,7 @@ public class UserEntity {
     /**
      * The role of the user.
      */
-    private String role;
-
-    /**
-     * Creates a user.
-     *
-     * @param email the email of the user
-     * @param fullName the full name of the user
-     * @param password the password of the user
-     */
-    public UserEntity(final String email,
-                      final String fullName,
-                final String password) {
-        this.email = email;
-        this.password = password;
-        this.fullName = fullName;
-        this.role = "Admin";
-    }
+    private Role role;
 
     /**
      * This method converts a user to a userEntity.
@@ -59,7 +44,7 @@ public class UserEntity {
      */
     public static UserEntity build(final User user) {
         return new UserEntity(user.getEmail(), user.getFullName(),
-                user.getPassword());
+                user.getPassword(), user.getRole());
     }
 
     /**
@@ -68,6 +53,6 @@ public class UserEntity {
      */
     public User toUser() {
         return new User(this.getEmail(),
-                this.getFullName(), this.getPassword());
+                this.getFullName(), this.getPassword(), this.getRole());
     }
 }

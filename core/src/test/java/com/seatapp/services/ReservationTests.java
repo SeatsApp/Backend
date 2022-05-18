@@ -1,6 +1,7 @@
 package com.seatapp.services;
 
 import com.seatapp.domain.Reservation;
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,7 +52,7 @@ class ReservationTests {
     private static final User VALID_USER =
             new User("User1",
                     "User@Test.be",
-                    "User1");
+                    "User1", Role.ADMIN);
 
     @Test
     void checkIfTimeslotFreeWithSameHours() {
