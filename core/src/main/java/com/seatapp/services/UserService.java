@@ -1,5 +1,6 @@
 package com.seatapp.services;
 
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 
 public interface UserService {
@@ -29,5 +30,6 @@ public interface UserService {
      */
      User createUser(String email,
                      String fullName,
-                     String password);
+                     String password,
+                     Role role);
 }

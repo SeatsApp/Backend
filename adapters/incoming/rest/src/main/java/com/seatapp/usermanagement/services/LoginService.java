@@ -1,5 +1,6 @@
 package com.seatapp.usermanagement.services;
 
+import com.seatapp.domain.Role;
 import org.springframework.security.core.Authentication;
 
 public interface LoginService {
@@ -12,5 +13,5 @@ public interface LoginService {
      * @return the authentication of the user that logged in.
      */
     Authentication login(String email, String fullName,
-                                String password);
+                         String password, Role role);
 }
