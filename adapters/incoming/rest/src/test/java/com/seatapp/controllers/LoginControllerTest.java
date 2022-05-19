@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -64,6 +66,12 @@ class LoginControllerTest {
     @MockBean(name = "userRepositoryImpl")
     private UserRepository userRepository;
 
+    /**
+     * Represents the mocked authentication manager.
+     */
+    @MockBean
+    private AuthenticationManager authenticationManager;
+
     @Test
     void healthCheckWithFilter() throws Exception {
         String jwt = jwtService.generateToken(
@@ -117,9 +125,17 @@ class LoginControllerTest {
 
     @Test
     void loginWeb() throws Exception {
+        // Arrange
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .addFilter(springSecurityFilterChain).build();
 
+        String email = "thomas.vandewalle@cronos.be";
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(email, email);
+        when(authenticationManager.authenticate(authentication))
+                .thenReturn(authentication);
+
+        // Act & Assert
         mockMvc.perform(get("/api/login/web").with(
                         oauth2Login().oauth2User(new OAuth2User() {
                             @Override
@@ -148,9 +164,17 @@ class LoginControllerTest {
 
     @Test
     void loginExpo() throws Exception {
+        // Arrange
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .addFilter(springSecurityFilterChain).build();
 
+        String email = "thomas.vandewalle@cronos.be";
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(email, email);
+        when(authenticationManager.authenticate(authentication))
+                .thenReturn(authentication);
+
+        // Act & Assert
         mockMvc.perform(get("/api/login/expo").with(
                         oauth2Login().oauth2User(new OAuth2User() {
                             @Override
