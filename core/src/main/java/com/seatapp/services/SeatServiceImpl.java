@@ -95,7 +95,13 @@ public class SeatServiceImpl implements SeatService {
         if (newReservation == null) {
             throw new IllegalArgumentException("ReservationDto cannot be null");
         }
+
         Seat seat = getSeatById(seatId);
+        if (!seat.isAvailable()) {
+            throw new IllegalArgumentException(
+                    "You can't reserve when the seat is unavailable");
+        }
+
         seat.addReservation(newReservation);
         seatRepository.save(seat);
         return seat;

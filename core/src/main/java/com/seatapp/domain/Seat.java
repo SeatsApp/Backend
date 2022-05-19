@@ -21,6 +21,12 @@ public class Seat {
      * Represents the seats' name.
      */
     private String name;
+
+    /**
+     * Represents if the seat is available for reservations.
+     */
+    private boolean available;
+
     /**
      * Represents the reservations a seat.
      */
@@ -34,17 +40,19 @@ public class Seat {
     public Seat(final String name) {
         this.name = name;
         this.reservations = new ArrayList<>();
+        this.available = true;
     }
 
     /**
      * Creates a seat with a specified name.
      *
-     * @param name The seats' name
+     * @param name         The seats' name
      * @param reservations the seats' reservations
      */
     public Seat(final String name, final List<Reservation> reservations) {
         this.name = name;
         this.reservations = reservations;
+        this.available = true;
     }
 
     /**

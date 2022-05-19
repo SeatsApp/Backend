@@ -44,8 +44,7 @@ public class ReservationEntity {
      * Represents the user who placed the reservation.
      */
     @ManyToOne(cascade = {CascadeType.PERSIST,
-            CascadeType.REFRESH,
-            CascadeType.MERGE})
+            CascadeType.REFRESH})
     private UserEntity userEntity;
 
     /**

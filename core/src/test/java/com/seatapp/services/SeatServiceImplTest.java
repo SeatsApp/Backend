@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -84,7 +85,7 @@ class SeatServiceImplTest {
 
         //Assert
         Seat expectedSeat = new Seat(1L, "Test",
-                null);
+                true, null);
         assertEquals(expectedSeat.getId(), savedSeat.getId());
         assertEquals(expectedSeat.getName(), savedSeat.getName());
     }
@@ -247,8 +248,30 @@ class SeatServiceImplTest {
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () ->
                 seatService.reserve(1L,
-                new Reservation(LocalDateTime.now().plusHours(HOURS_ADDED3),
-                        LocalDateTime.now().plusHours(1), new User())));
+                        new Reservation(LocalDateTime.now()
+                                .plusHours(HOURS_ADDED3),
+                                LocalDateTime.now().plusHours(1),
+                                new User())));
+    }
+
+    @Test
+    void reserveUnavailableSeatTest() {
+        // Arrange
+        when(seatRepository.findById(1L)).thenReturn(new Seat(1L,
+                "Test", false, new ArrayList<>()));
+        when(seatRepository.save(Mockito.any(Seat.class)))
+                .thenAnswer(i -> {
+                    Seat seat = i.getArgument(0);
+                    seat.setId(1L);
+                    return seat;
+                });
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () ->
+                seatService.reserve(1L,
+                        new Reservation(LocalDateTime.now().plusHours(1),
+                                LocalDateTime.now().plusHours(HOURS_ADDED3),
+                                new User())));
     }
 
     @Test
