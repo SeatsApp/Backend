@@ -6,6 +6,7 @@ import com.seatapp.usermanagement.services.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,10 +43,24 @@ public class LoginController {
     private final JwtService jwtService;
 
     /**
+     * Time before the start of a
+     * reservation where you can check in.
+     */
+    @Value("${redirect.web}")
+    private String redirectUrlWeb;
+
+    /**
+     * Time before the start of a
+     * reservation where you can check in.
+     */
+    @Value("${redirect.expo}")
+    private String redirectUrlExpo;
+
+    /**
      * Creates a login controller.
      *
      * @param loginService the login service to manage the users.
-     * @param jwtService the jwt service
+     * @param jwtService   the jwt service
      */
     @Autowired
     public LoginController(final LoginService loginService,
@@ -96,7 +111,7 @@ public class LoginController {
                     principal.getName());
         }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("http://localhost:19006?JWT=" + jwt))
+                .location(URI.create(redirectUrlWeb + "?JWT=" + jwt))
                 .build();
     }
 
@@ -125,7 +140,7 @@ public class LoginController {
                     principal.getName());
         }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("exp://10.0.2.2:19000?JWT="
+                .location(URI.create(redirectUrlExpo + "?JWT="
                         + jwt)).build();
     }
 
