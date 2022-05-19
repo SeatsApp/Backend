@@ -1,6 +1,5 @@
 package com.seatapp.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +31,6 @@ public class Reservation {
     /**
      * Represents the user who placed the reservation.
      */
-    @JsonIgnore
     private User user;
 
 

@@ -14,21 +14,57 @@ import java.util.stream.Collectors;
 @Component
 public class SeatRepositoryImpl implements SeatRepository {
     /**
+     * Loading in the data for an island of 4 seats.
+     */
+    private static final int ISLAND_SEAT4 = 5;
+
+    /**
+     * Loading in the data for an island of 6 seats.
+     */
+    private static final int ISLAND_SEAT6 = 7;
+
+
+    /**
      * The seat repository.
      */
     private final SeatRepositoryJpa repository;
 
     /**
      * Creates the SeatRepositoryImpl.
+     *
      * @param repository the repository.
      */
     @Autowired
     public SeatRepositoryImpl(final SeatRepositoryJpa repository) {
         this.repository = repository;
+        initEntities();
+    }
+
+    /**
+     * Initialize the static floorplan.
+     */
+    private void initEntities() {
+        for (int i = 1; i < ISLAND_SEAT4; i++) {
+            save(new Seat("A" + i));
+            save(new Seat("B" + i));
+            save(new Seat("C" + i));
+            save(new Seat("D" + i));
+        }
+
+        for (int i = 1; i < ISLAND_SEAT6; i++) {
+            save(new Seat("E" + i));
+            save(new Seat("F" + i));
+            save(new Seat("G" + i));
+            save(new Seat("H" + i));
+            save(new Seat("I" + i));
+            save(new Seat("J" + i));
+            save(new Seat("K" + i));
+        }
     }
 
     /**
      * Saves a seat to the database.
+     *
      * @param seat the seat you want to save
      * @return the saved seat
      */
@@ -42,6 +78,7 @@ public class SeatRepositoryImpl implements SeatRepository {
 
     /**
      * Deletes a seat from the database.
+     *
      * @param seatId id of the seat that will be deleted
      */
     @Override
@@ -54,6 +91,7 @@ public class SeatRepositoryImpl implements SeatRepository {
 
     /**
      * Finds all the existing seats.
+     *
      * @return a list of all the seats
      */
     @Override
@@ -66,6 +104,7 @@ public class SeatRepositoryImpl implements SeatRepository {
 
     /**
      * Find a seat by the given id.
+     *
      * @param seatId the id of the seat you want to find
      * @return The found seat else error.
      */

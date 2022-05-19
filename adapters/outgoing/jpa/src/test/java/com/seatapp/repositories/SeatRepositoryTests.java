@@ -6,6 +6,7 @@ import com.seatapp.domain.Role;
 import com.seatapp.domain.Seat;
 import com.seatapp.domain.User;
 import com.seatapp.exceptions.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +36,11 @@ class SeatRepositoryTests {
      */
     @Autowired
     private SeatRepositoryImpl seatRepository;
+
+    @BeforeEach
+    void setup() {
+        seatRepository.deleteAll();
+    }
 
     @Test
     @Transactional
@@ -72,7 +78,8 @@ class SeatRepositoryTests {
     void findAllSeats() {
         //Arrange
         seatRepository.save(VALID_SEAT);
-        seatRepository.save(new Seat(2L, "Test", new ArrayList<>()));
+        seatRepository.save(new Seat(2L, "Test",
+                true, new ArrayList<>()));
 
         //Act
         List<Seat> foundSeats = seatRepository.findAll();
@@ -109,7 +116,8 @@ class SeatRepositoryTests {
     void deleteAllSeats() {
         //Arrange
         seatRepository.save(VALID_SEAT);
-        seatRepository.save(new Seat(2L, "Test", new ArrayList<>()));
+        seatRepository.save(new Seat(2L, "Test",
+                true, new ArrayList<>()));
 
         //Act
         seatRepository.deleteAll();

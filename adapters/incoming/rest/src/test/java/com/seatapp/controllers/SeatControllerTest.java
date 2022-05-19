@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -190,10 +191,10 @@ class SeatControllerTest {
     @Test
     void createSeat() throws Exception {
         // Arrange
-        SeatDto seatDto = new SeatDto("Test");
+        SeatDto seatDto = new SeatDto(1L, "Test", null, null);
 
         when(seatService.createSeat(any(Seat.class)))
-                .thenReturn(new Seat(1L, "Test",
+                .thenReturn(new Seat(1L, "Test", true,
                         new ArrayList<>()));
 
         // Act & Assert
@@ -218,7 +219,7 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithEmptyStringAsName() throws Exception {
-        SeatDto seatDto = new SeatDto("");
+        SeatDto seatDto = new SeatDto(1L, "", null, null);
 
         mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper
@@ -230,7 +231,7 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithNameNull() throws Exception {
-        SeatDto seatDto = new SeatDto(null);
+        SeatDto seatDto = new SeatDto(1L, null, null, null);
 
         mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper
@@ -275,8 +276,10 @@ class SeatControllerTest {
     @Test
     void getSeats() throws Exception {
         when(seatService.getAll()).thenReturn(List.of(
-                new Seat(1L, "Test1", new ArrayList<>()),
-                new Seat(2L, "Test2", new ArrayList<>())));
+                new Seat(1L, "Test1",
+                        true, new ArrayList<>()),
+                new Seat(2L, "Test2",
+                        true, new ArrayList<>())));
 
         mockMvc.perform(get(apiSeatsUrl)
                         .with(authentication(authentication))
@@ -308,14 +311,16 @@ class SeatControllerTest {
         LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
                 DATE_DAY, DATE_HOUR_17, 0, 0);
 
-        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
+        ReservationDto reservationDto = new ReservationDto(startTime,
+                endTime, false);
 
         Reservation reservation = new Reservation(
-                reservationDto.getStartTime(),
-                reservationDto.getEndTime(),
+                reservationDto.getStartDateTime(),
+                reservationDto.getEndDateTime(),
                 new User());
         when(seatService.reserve(1L, reservation))
-                .thenReturn(new Seat(1L, "Test", new ArrayList<>()));
+                .thenReturn(new Seat(1L, "Test",
+                        true, new ArrayList<>()));
 
         mockMvc.perform(patch(apiSeatsUrl + 1L
                         + reserveString).with(authentication(authentication))
@@ -335,7 +340,8 @@ class SeatControllerTest {
         LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
                 DATE_DAY, DATE_HOUR_17, 0, 0);
 
-        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
+        ReservationDto reservationDto = new ReservationDto(startTime,
+                endTime, false);
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -359,7 +365,8 @@ class SeatControllerTest {
         LocalDateTime endTime = LocalDateTime.of(DATE_YEAR, DATE_MONTH,
                 DATE_DAY, DATE_HOUR_17, 0, 0);
 
-        ReservationDto reservationDto = new ReservationDto(startTime, endTime);
+        ReservationDto reservationDto = new ReservationDto(startTime,
+                endTime, false);
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -382,7 +389,8 @@ class SeatControllerTest {
                 DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
 
         ReservationDto reservationDto =
-                new ReservationDto(startTimeNew, endTimeNew);
+                new ReservationDto(startTimeNew,
+                        endTimeNew, false);
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -405,7 +413,8 @@ class SeatControllerTest {
                 DATE_DAY, DATE_HOUR_17, 0, 0);
 
         ReservationDto reservationDto =
-                new ReservationDto(startTimeNew, endTimeNew);
+                new ReservationDto(startTimeNew,
+                        endTimeNew, false);
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -428,7 +437,7 @@ class SeatControllerTest {
                 DATE_DAY, DATE_HOUR_13, 0, 0);
 
         ReservationDto reservationDto =
-                new ReservationDto(startTimeNew, endTimeNew);
+                new ReservationDto(startTimeNew, endTimeNew, false);
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -451,7 +460,7 @@ class SeatControllerTest {
                 DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
 
         ReservationDto reservationDto =
-                new ReservationDto(startTimeNew, endTimeNew);
+                new ReservationDto(startTimeNew, endTimeNew, false);
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -468,6 +477,7 @@ class SeatControllerTest {
 
     @Test
     void getSeatsWithReservationsByDate() throws Exception {
+        // Arrange
         LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR,
                 DATE_MONTH, DATE_DAY, DATE_HOUR_14, 0, 0);
         LocalDateTime endTimeNew = LocalDateTime.of(DATE_YEAR,
@@ -484,8 +494,17 @@ class SeatControllerTest {
                 LocalDate.of(DATE_YEAR,
                         DATE_MONTH, DATE_DAY)))
                 .thenReturn(List.of(seat1));
-        String json = objectMapper.writeValueAsString(List.of(seat1));
 
+        List<SeatDto> seatDtos = Stream.of(seat1)
+                .map(seat -> SeatDto.build(seat,
+                        startTimeNew.toLocalDate()
+                                .atTime(0, 0),
+                        startTimeNew.toLocalDate()
+                                .plusDays(1).atTime(0, 0)))
+                .toList();
+        String json = objectMapper.writeValueAsString(seatDtos);
+
+        // Act & Assert
         mockMvc.perform(get("/api/seats/reservations/date/2024-04-27")
                         .with(authentication(authentication))
                         .header(authorizationString, bearerString

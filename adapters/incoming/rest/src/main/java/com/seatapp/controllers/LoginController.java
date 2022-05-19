@@ -125,7 +125,7 @@ public class LoginController {
                     principal.getName());
         }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("exp://10.150.196.23:19000?JWT="
+                .location(URI.create("exp://10.0.2.2:19000?JWT="
                         + jwt)).build();
     }
 

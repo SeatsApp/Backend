@@ -17,8 +17,10 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "Seat")
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class SeatEntity {
     /**
      * Represents the seats' id.
@@ -30,6 +32,12 @@ public class SeatEntity {
      * Represents the seats' name.
      */
     private String name;
+
+    /**
+     * Represents if the seat is available for reservations.
+     */
+    private boolean available;
+
     /**
      * Represents the reservations a seat.
      */
@@ -39,7 +47,7 @@ public class SeatEntity {
     /**
      * Creates a seat with a specified name.
      *
-     * @param name The seats' name
+     * @param name         The seats' name
      * @param reservations the seats' reservations
      */
     public SeatEntity(final String name,
@@ -50,24 +58,28 @@ public class SeatEntity {
 
     /**
      * This method converts a seat to a seatEntity.
+     *
      * @param seat the to be converted seat
      * @return a seat entity
      */
     public static SeatEntity build(final Seat seat) {
         return new SeatEntity(seat.getId(), seat.getName(),
+                seat.isAvailable(),
                 seat.getReservations().stream()
-                .map(ReservationEntity::build)
+                        .map(ReservationEntity::build)
                         .collect(Collectors.toList()));
     }
 
     /**
      * This method converts a seatEntity to a seat.
+     *
      * @return a seat
      */
     public Seat toSeat() {
         return new Seat(this.getId(), this.getName(),
+                this.isAvailable(),
                 getReservations().stream()
-                .map(ReservationEntity::toReservation)
+                        .map(ReservationEntity::toReservation)
                         .collect(Collectors.toList()));
     }
 }
