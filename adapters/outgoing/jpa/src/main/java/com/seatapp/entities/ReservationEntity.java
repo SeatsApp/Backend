@@ -13,10 +13,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.CascadeType;
 import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "Reservation")
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class ReservationEntity {
     /**
      * Represents the reservations' id.
@@ -28,17 +31,22 @@ public class ReservationEntity {
     /**
      * Represents the start time of a reservation.
      */
-    private LocalDateTime startTime;
+    private LocalDateTime startDateTime;
 
     /**
      * Represents the end time of a reservation.
      */
-    private LocalDateTime endTime;
+    private LocalDateTime endDateTime;
 
     /**
      * Represents if reservation is checked in.
      */
     private boolean checkedIn;
+
+    /**
+     * Represents when a reservation is cancelled.
+     */
+    private boolean cancelled;
 
     /**
      * Represents the user who placed the reservation.
@@ -50,26 +58,30 @@ public class ReservationEntity {
     /**
      * Creates reservation with the details.
      *
-     * @param id id of the reservation.
-     * @param startTime start time of the reservation.
-     * @param endTime   end time of the reservation.
+     * @param id         id of the reservation.
+     * @param startDateTime  start time of the reservation.
+     * @param endDateTime    end time of the reservation.
      * @param userEntity the user who made the reservation.
-     * @param checkedIn if the reservation is checkedIn or not.
+     * @param checkedIn  if the reservation is checkedIn or not
+     * @param cancelled  if the reservation is cancelled or not
      */
     public ReservationEntity(final Long id,
-                             final LocalDateTime startTime,
-                             final LocalDateTime endTime,
+                             final LocalDateTime startDateTime,
+                             final LocalDateTime endDateTime,
                              final UserEntity userEntity,
-                             final boolean checkedIn) {
+                             final boolean checkedIn,
+                             final boolean cancelled) {
         this.id = id;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
         this.checkedIn = checkedIn;
         this.userEntity = userEntity;
+        this.cancelled = cancelled;
     }
 
     /**
      * This method converts a reservation to a reservationEntity.
+     *
      * @param reservation the to be converted reservation
      * @return a reservation entity
      */
@@ -78,15 +90,17 @@ public class ReservationEntity {
                 reservation.getStartDateTime(),
                 reservation.getEndDateTime(),
                 UserEntity.build(reservation.getUser()),
-                reservation.isCheckedIn());
+                reservation.isCheckedIn(),
+                reservation.isCancelled());
     }
 
     /**
      * This method converts a reservationEntity to a reservation.
+     *
      * @return a reservation
      */
     public Reservation toReservation() {
-        return new Reservation(getId(), getStartTime(), getEndTime(),
-                isCheckedIn(), userEntity.toUser());
+        return new Reservation(getId(), getStartDateTime(), getEndDateTime(),
+                isCheckedIn(), userEntity.toUser(), isCancelled());
     }
 }

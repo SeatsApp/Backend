@@ -1,4 +1,4 @@
-package com.seatapp.services.usermanagement;
+package com.seatapp.repositories;
 
 import com.seatapp.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -3,7 +3,6 @@ package com.seatapp.repositories;
 import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import com.seatapp.exceptions.EntityNotFoundException;
-import com.seatapp.services.usermanagement.UserRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

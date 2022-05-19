@@ -1,7 +1,6 @@
 package com.seatapp.repositories;
 
 import com.seatapp.domain.Seat;
-
 import java.util.List;
 
 

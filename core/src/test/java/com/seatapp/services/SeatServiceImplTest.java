@@ -7,10 +7,10 @@ import com.seatapp.domain.User;
 import com.seatapp.exceptions.EntityNotFoundException;
 import com.seatapp.repositories.SeatRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,14 +33,15 @@ class SeatServiceImplTest {
     /**
      * Represents the seat repository.
      */
-    @Mock
+    @MockBean(name = "seatRepositoryImpl")
     private SeatRepository seatRepository;
 
     /**
      * Represents the seat service.
      */
-    @InjectMocks
-    private SeatServiceImpl seatService;
+    @Autowired
+    private SeatService seatService;
+
     /**
      * Hours added in the tests.
      */
@@ -332,5 +333,33 @@ class SeatServiceImplTest {
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void getAllByUser() {
+        //given
+        Seat seat1 = new Seat("Test");
+        seat1.getReservations().add(new Reservation(1L,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                false,
+                new User("test", "", "", Role.USER),
+                false));
+        seat1.getReservations().add(new Reservation(1L,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                false,
+                new User("someone else", "", "", Role.USER),
+                false));
+        seat1.setId(1L);
+
+        given(seatRepository.findAll()).willReturn(List.of(seat1));
+
+        //act
+        List<Seat> seats = seatService.getAllByUser("test");
+
+        //assert
+        assertEquals(1L, seats.get(0).getReservations().get(0).getId());
+        assertEquals(1, seats.get(0).getReservations().size());
     }
 }

@@ -61,8 +61,12 @@ public class Seat {
      * @param newReservation the new reservation.
      */
     public void addReservation(final Reservation newReservation) {
-        if (newReservation.isValidNewReservation(this.reservations)) {
-            reservations.add(newReservation);
+        List<Reservation> filteredReservations = new ArrayList<>(
+                this.reservations.stream()
+                        .filter(reservation -> !reservation.isCancelled())
+                        .toList());
+        if (newReservation.isValidNewReservation(filteredReservations)) {
+            this.reservations.add(newReservation);
         } else {
             throw new IllegalArgumentException("The reservation is not valid");
         }

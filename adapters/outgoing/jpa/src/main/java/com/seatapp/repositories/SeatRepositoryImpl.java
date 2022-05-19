@@ -1,9 +1,8 @@
-package com.seatapp;
+package com.seatapp.repositories;
 
 import com.seatapp.domain.Seat;
 import com.seatapp.entities.SeatEntity;
 import com.seatapp.exceptions.EntityNotFoundException;
-import com.seatapp.repositories.SeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

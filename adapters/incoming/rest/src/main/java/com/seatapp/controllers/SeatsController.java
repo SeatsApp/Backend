@@ -89,9 +89,12 @@ public class SeatsController {
      * @return Returns a responseEntity with the HttpStatus and the found seats.
      */
     @GetMapping
-    public ResponseEntity<List<Seat>> getSeats() {
+    public ResponseEntity<List<SeatDto>> getSeats() {
         List<Seat> foundSeats = seatService.getAll();
-        return ResponseEntity.ok(foundSeats);
+        List<SeatDto> seatDtos = foundSeats.stream()
+                .map(SeatDto::build)
+                .toList();
+        return ResponseEntity.ok(seatDtos);
     }
 
     /**
