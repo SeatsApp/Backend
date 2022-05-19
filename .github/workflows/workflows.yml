@@ -103,7 +103,7 @@ jobs:
         env:
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          SPRING.PROFILES.ACTIVE: prod
+          SPRING_PROFILES_ACTIVE: prod
         run: |
           echo "Releasing to Amazon Lightsail"
 
