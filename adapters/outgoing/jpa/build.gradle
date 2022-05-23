@@ -40,6 +40,9 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     implementation 'org.hibernate.validator:hibernate-validator:7.0.4.Final'
 
+    // Deployed postgresql database
+    implementation 'org.postgresql:postgresql:42.1.4'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
