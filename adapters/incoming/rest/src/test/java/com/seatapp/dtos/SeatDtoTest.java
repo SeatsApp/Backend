@@ -3,7 +3,9 @@ package com.seatapp.dtos;
 import com.seatapp.controllers.dtos.SeatDto;
 import com.seatapp.controllers.dtos.SeatStatusDto;
 import com.seatapp.domain.Reservation;
+import com.seatapp.domain.Role;
 import com.seatapp.domain.Seat;
+import com.seatapp.domain.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -60,7 +62,8 @@ class SeatDtoTest {
         Seat seat = new Seat("Test");
 
         seat.setReservations(List.of(new Reservation(LocalDateTime.now(),
-                LocalDateTime.now().plusHours(HOURS_ADDED3), null)));
+                LocalDateTime.now().plusHours(HOURS_ADDED3), new User("test",
+                "test", "test", Role.USER))));
 
         // Act
         SeatDto seatDto = SeatDto.build(seat,
@@ -78,7 +81,8 @@ class SeatDtoTest {
         Seat seat = new Seat("Test");
 
         seat.setReservations(List.of(new Reservation(LocalDateTime.now(),
-                LocalDateTime.now().plusHours(HOURS_ADDED5), null)));
+                LocalDateTime.now().plusHours(HOURS_ADDED5), new User("test",
+                "test", "test", Role.USER))));
 
         // Act
         SeatDto seatDto = SeatDto.build(seat,
@@ -100,7 +104,8 @@ class SeatDtoTest {
                         LocalDate.now()
                                 .atTime(HOURS0, MINUTES0)
                                 .plusHours(HOURS_ADDED3),
-                        null),
+                        new User("test",
+                                "test", "test", Role.USER)),
                 new Reservation(LocalDate.now()
                         .atTime(HOURS0, MINUTES0)
                         .plusHours(HOURS_ADDED3),
@@ -108,7 +113,8 @@ class SeatDtoTest {
                                 .atTime(HOURS0, MINUTES0)
                                 .plusHours(HOURS_ADDED3)
                                 .plusHours(HOURS_ADDED3),
-                        null)));
+                        new User("test",
+                                "test", "test", Role.USER))));
 
         // Act
         SeatDto seatDto = SeatDto.build(seat,

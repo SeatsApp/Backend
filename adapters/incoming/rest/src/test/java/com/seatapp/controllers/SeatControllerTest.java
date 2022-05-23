@@ -3,6 +3,7 @@ package com.seatapp.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
+import com.seatapp.controllers.dtos.UserDto;
 import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Role;
 import com.seatapp.domain.Seat;
@@ -316,7 +317,7 @@ class SeatControllerTest {
                 DATE_DAY, DATE_HOUR_17, 0, 0);
 
         ReservationDto reservationDto = new ReservationDto(startTime,
-                endTime, false);
+                endTime, false, new UserDto());
 
         Reservation reservation = new Reservation(
                 reservationDto.getStartDateTime(),
@@ -345,7 +346,7 @@ class SeatControllerTest {
                 DATE_DAY, DATE_HOUR_17, 0, 0);
 
         ReservationDto reservationDto = new ReservationDto(startTime,
-                endTime, false);
+                endTime, false, new UserDto());
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -370,7 +371,7 @@ class SeatControllerTest {
                 DATE_DAY, DATE_HOUR_17, 0, 0);
 
         ReservationDto reservationDto = new ReservationDto(startTime,
-                endTime, false);
+                endTime, false, new UserDto());
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -394,7 +395,7 @@ class SeatControllerTest {
 
         ReservationDto reservationDto =
                 new ReservationDto(startTimeNew,
-                        endTimeNew, false);
+                        endTimeNew, false, new UserDto());
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -418,7 +419,7 @@ class SeatControllerTest {
 
         ReservationDto reservationDto =
                 new ReservationDto(startTimeNew,
-                        endTimeNew, false);
+                        endTimeNew, false, new UserDto());
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -441,7 +442,8 @@ class SeatControllerTest {
                 DATE_DAY, DATE_HOUR_13, 0, 0);
 
         ReservationDto reservationDto =
-                new ReservationDto(startTimeNew, endTimeNew, false);
+                new ReservationDto(startTimeNew, endTimeNew, false,
+                        new UserDto());
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());
@@ -464,7 +466,8 @@ class SeatControllerTest {
                 DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
 
         ReservationDto reservationDto =
-                new ReservationDto(startTimeNew, endTimeNew, false);
+                new ReservationDto(startTimeNew, endTimeNew, false,
+                        new UserDto());
 
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenThrow(new IllegalArgumentException());

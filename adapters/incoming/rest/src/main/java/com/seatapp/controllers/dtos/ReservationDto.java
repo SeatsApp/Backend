@@ -31,6 +31,11 @@ public class ReservationDto {
     private boolean checkedIn;
 
     /**
+     * Represents the user of the reservation.
+     */
+    private UserDto user;
+
+    /**
      * This method converts a reservation to a reservationDto.
      *
      * @param reservation the to be converted reservation
@@ -40,6 +45,7 @@ public class ReservationDto {
         return new ReservationDto(
                 reservation.getStartDateTime(),
                 reservation.getEndDateTime(),
-                reservation.isCheckedIn());
+                reservation.isCheckedIn(), UserDto
+                .build(reservation.getUser()));
     }
 }
