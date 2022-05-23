@@ -37,6 +37,23 @@ public class SeatDto {
     private List<ReservationDto> reservations;
 
     /**
+     * This method converts a seat to a seatDto without
+     * giving the seats a status.
+     *
+     * @param seat the to be converted seat
+     * @return a seat dto
+     */
+    public static SeatDto build(final Seat seat) {
+
+        return new SeatDto(seat.getId(),
+                seat.getName(),
+                null,
+                seat.getReservations().stream()
+                        .map(ReservationDto::build)
+                        .toList());
+    }
+
+    /**
      * This method converts a seat to a seatDto.
      *
      * @param seat          the to be converted seat

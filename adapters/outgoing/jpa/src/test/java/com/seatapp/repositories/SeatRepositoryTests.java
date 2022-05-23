@@ -1,6 +1,5 @@
 package com.seatapp.repositories;
 
-import com.seatapp.SeatRepositoryImpl;
 import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Role;
 import com.seatapp.domain.Seat;

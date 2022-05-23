@@ -48,10 +48,21 @@ public interface SeatService {
     List<Seat> getAllWithReservationsByDate(LocalDate date);
 
     /**
+     * Gets all the seat with their reservations
+     * by the user who reserved them.
+     *
+     * @param email the email of the user to find
+     *              the seats with the reservations
+     * @return the list of the found seats
+     */
+    List<Seat> getAllByUser(String email);
+
+    /**
      * Checks in on the reservation of the seat.
      *
      * @param seatId   the seatId from the seat where you check in.
      * @param username username of the person wanting to check in.
      */
     void checkInOnSeat(Long seatId, String username);
+
 }

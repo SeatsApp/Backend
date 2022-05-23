@@ -10,7 +10,8 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 public class Reservation {
     /**
      * Represents the reservations' id.
@@ -33,21 +34,26 @@ public class Reservation {
      */
     private User user;
 
+    /**
+     * Represents when a reservation is cancelled.
+     */
+    private boolean cancelled;
 
     /**
      * Creates reservation with the details.
      *
      * @param startDateTime start time of the reservation.
      * @param endDateTime   end time of the reservation.
-     * @param user the user who made the reservation.
+     * @param user          the user who made the reservation.
      */
     public Reservation(final LocalDateTime startDateTime,
                        final LocalDateTime endDateTime,
                        final User user) {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.checkedIn = false;
         this.user = user;
+        this.checkedIn = false;
+        this.cancelled = false;
     }
 
     /**
@@ -138,8 +144,9 @@ public class Reservation {
 
     /**
      * Changes the checked in status of a reservation.
+     *
      * @param username username of the person
-     *                wanting to check in.
+     *                 wanting to check in.
      */
     public void checkIn(final String username) {
         if (isCheckedIn()) {

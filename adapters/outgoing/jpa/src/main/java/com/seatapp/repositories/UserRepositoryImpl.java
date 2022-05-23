@@ -1,9 +1,8 @@
-package com.seatapp.services.usermanagement;
+package com.seatapp.repositories;
 
 import com.seatapp.domain.User;
 import com.seatapp.entities.UserEntity;
 import com.seatapp.exceptions.EntityNotFoundException;
-import com.seatapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

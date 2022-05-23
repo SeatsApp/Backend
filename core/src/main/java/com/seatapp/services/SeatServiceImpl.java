@@ -120,6 +120,33 @@ public class SeatServiceImpl implements SeatService {
             s.setReservations(s.getReservations().stream()
                     .filter(reservation -> reservation.getStartDateTime()
                             .toLocalDate().equals(date))
+                    .filter(reservation -> !reservation.isCancelled())
+                    .toList());
+        }
+        return foundSeats;
+    }
+
+    /**
+     * Gets all the seat with their reservations
+     * by the user who reserved them.
+     *
+     * @param email the email of the user to find
+     *              the seats with the reservations
+     * @return the list of the found seats
+     */
+    @Override
+    public List<Seat> getAllByUser(final String email) {
+        List<Seat> foundSeats = getAll();
+        for (Seat s : foundSeats) {
+            s.setReservations(s.getReservations().stream()
+                    .filter(reservation -> reservation.getUser().getEmail()
+                            .equals(email))
+                    .filter(reservation ->
+                            LocalDate.now()
+                                    .atTime(0, 0)
+                                    .minusHours(1)
+                                    .isBefore(reservation.getStartDateTime()))
+                    .filter(reservation -> !reservation.isCancelled())
                     .toList());
         }
         return foundSeats;

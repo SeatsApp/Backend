@@ -1,4 +1,4 @@
-package com.seatapp;
+package com.seatapp.repositories;
 
 import com.seatapp.entities.SeatEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
