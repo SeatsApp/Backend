@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +29,9 @@ class JwtServiceImplTest {
         String password = "Test";
         Authentication authentication =
                 Mockito.spy(new UsernamePasswordAuthenticationToken(email,
-                        password));
+                        password, List.of(
+                        new SimpleGrantedAuthority(
+                                "ADMIN"))));
         Mockito.when(authentication.getName())
                 .thenReturn(email);
 

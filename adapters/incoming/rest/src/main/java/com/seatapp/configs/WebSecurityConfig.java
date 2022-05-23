@@ -1,5 +1,6 @@
 package com.seatapp.configs;
 
+import com.seatapp.filters.AdminFilter;
 import com.seatapp.filters.JwtAuthorizationFilter;
 import com.seatapp.usermanagement.services.JwtService;
 import com.seatapp.usermanagement.services.JwtUserDetailsService;
@@ -98,11 +99,21 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(),
+                .addFilter(new JwtAuthorizationFilter(
+                        authenticationManager(),
                         jwtServiceImpl,
-                        userDetailsService, "/api/login/", "/actuator/"))
+                        userDetailsService,
+                        "/api/login/",
+                        "/actuator/",
+                        "/api/admin/login"))
+                .addFilter(new AdminFilter(authenticationManager(),
+                        jwtServiceImpl,
+                        "POST /api/seats",
+                        "DELETE /api/seats",
+                        "GET /api/admin/healthcheck"))
                 .authorizeRequests()
-                .antMatchers("/api/login/**").authenticated()
+                .antMatchers("/api/login/**",
+                        "/api/admin/login/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .oauth2Login()

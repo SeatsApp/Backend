@@ -21,21 +21,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Map;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.mockito.Mockito.when;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(locations = "classpath:application-test.properties")
-class LoginControllerTest {
+class AdminLoginControllerTest {
     /**
      * Represents mockMvc.
      */
@@ -73,7 +72,7 @@ class LoginControllerTest {
     private AuthenticationManager authenticationManager;
 
     @Test
-    void healthCheckWithFilter() throws Exception {
+    void adminHealthCheck() throws Exception {
         String jwt = jwtService.generateToken(
                 new UsernamePasswordAuthenticationToken(
                         "test", "test", List.of(
@@ -89,44 +88,35 @@ class LoginControllerTest {
 
         // Act
         mockMvc
-                .perform(get("/api/healthcheck")
+                .perform(get("/api/admin/healthcheck")
                         .header("authorization", "Bearer " + jwt))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void healthCheckWithFilterAndInvalidToken() throws Exception {
+    void adminHealthCheckWithUser() throws Exception {
+        String jwt = jwtService.generateToken(
+                new UsernamePasswordAuthenticationToken(
+                        "test", "test", List.of(
+                        new SimpleGrantedAuthority(
+                                "USER"))));
+        when(userRepository.findByEmail("test"))
+                .thenReturn(new User());
+
         // Arrange
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
-        String jwt = "eyJhbGciOiJIUzUxMiJ9."
-                + "eyJzdWIiOiJUaG9tYXMgVmFuIERlIFdhbGxlIiwiZXhwIjoxNjUyMDc5ODg3"
-                + "LCJpYXQiOjE2NTE5OTM0ODd9.BPwt8xEyEkBUapIQKYpJP"
-                + "dDt80khWQzB7Nm7TsIJhbvjJ5msbRusifMHEzHkc4mDo8Ih0W9g";
 
         // Act
         mockMvc
-                .perform(get("/api/healthcheck")
+                .perform(get("/api/admin/healthcheck")
                         .header("authorization", "Bearer " + jwt))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void healthCheckWithFilterWithoutToken() throws Exception {
-        // Arrange
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
-                .apply(SecurityMockMvcConfigurers.springSecurity())
-                .build();
-
-        // Act
-        mockMvc
-                .perform(get("/api/healthcheck"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void loginWeb() throws Exception {
+    void loginAdminWeb() throws Exception {
         // Arrange
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
                 .addFilter(springSecurityFilterChain).build();
@@ -138,46 +128,7 @@ class LoginControllerTest {
                 .thenReturn(authentication);
 
         // Act & Assert
-        mockMvc.perform(get("/api/login/web").with(
-                        oauth2Login().oauth2User(new OAuth2User() {
-                            @Override
-                            public Map<String, Object> getAttributes() {
-                                Map<String, Object> map = new HashMap<>();
-                                map.put("preferred_username",
-                                        "thomas.vandewalle@cronos.be");
-                                return map;
-                            }
-
-                            @Override
-                            public Collection<? extends GrantedAuthority>
-                            getAuthorities() {
-                                return List.of(
-                                        new SimpleGrantedAuthority(
-                                                "APPROLE_Admin"));
-                            }
-
-                            @Override
-                            public String getName() {
-                                return "Thomas";
-                            }
-                        })))
-                .andExpect(status().is3xxRedirection());
-    }
-
-    @Test
-    void loginExpo() throws Exception {
-        // Arrange
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
-                .addFilter(springSecurityFilterChain).build();
-
-        String email = "thomas.vandewalle@cronos.be";
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(email, email);
-        when(authenticationManager.authenticate(authentication))
-                .thenReturn(authentication);
-
-        // Act & Assert
-        mockMvc.perform(get("/api/login/expo").with(
+        mockMvc.perform(get("/api/admin/login").with(
                         oauth2Login().oauth2User(new OAuth2User() {
                             @Override
                             public Map<String, Object> getAttributes() {
