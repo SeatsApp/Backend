@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -176,7 +177,10 @@ class SeatControllerTest {
                 .build();
 
         authentication = new UsernamePasswordAuthenticationToken(
-                VALID_USER.getEmail(), "PW");
+                VALID_USER.getEmail(), "PW",
+                List.of(
+                        new SimpleGrantedAuthority(
+                                "ADMIN")));
 
         jwt = jwtService.generateToken(authentication);
 

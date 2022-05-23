@@ -9,7 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,7 +22,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     /**
      * The service to authenticate and create JWT tokens.
      */
-    private final JwtService jwtServiceImpl;
+    private final JwtService jwtService;
     /**
      * The service to handle the login of user with JWT tokens.
      */
@@ -39,7 +38,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
      * of JWT tokens on certain paths.
      *
      * @param authManager             the authorization manager
-     * @param jwtServiceImpl                the service which handles the
+     * @param jwtService          the service which handles the
      *                                authentication and creation of
      *                                the JWT tokens
      * @param userDetailsService      the service that handles the calls
@@ -49,12 +48,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
      *                                it is contained in the url
      */
     public JwtAuthorizationFilter(final AuthenticationManager authManager,
-                                  final JwtService jwtServiceImpl,
+                                  final JwtService jwtService,
                                   final
                                   JwtUserDetailsService userDetailsService,
                                   final String... excludedPathsFromFilter) {
         super(authManager);
-        this.jwtServiceImpl = jwtServiceImpl;
+        this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.excludedPathsFromFilter =
                 Arrays.stream(excludedPathsFromFilter).toList();
@@ -70,12 +69,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 excludedPathsFromFilter.stream().anyMatch(url::contains);
 
         if (!hasExcludedPath) {
-            String jwt = parseJwt(request);
-            if (jwt == null || !jwtServiceImpl.validateJwtToken(jwt)) {
+            String jwt = jwtService.parseJwt(request);
+            if (jwt == null || !jwtService.validateJwtToken(jwt)) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 return;
             } else {
-                String email = jwtServiceImpl.getEmailFromJwtToken(jwt);
+                String email = jwtService.getEmailFromJwtToken(jwt);
 
                 UserDetails userDetails =
                         userDetailsService.loadUserByUsername(email);
@@ -92,17 +91,5 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             }
         }
         filterChain.doFilter(request, response);
-    }
-
-    private String parseJwt(final HttpServletRequest request) {
-        String headerAuth = request.getHeader("Authorization");
-
-        String startOfAuthorization = "Bearer ";
-        if (StringUtils.hasText(headerAuth)
-                && headerAuth.startsWith(startOfAuthorization)) {
-            return headerAuth.substring(startOfAuthorization.length());
-        }
-
-        return null;
     }
 }

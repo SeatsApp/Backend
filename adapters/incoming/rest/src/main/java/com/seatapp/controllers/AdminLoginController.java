@@ -22,13 +22,13 @@ import java.net.URI;
 
 @CrossOrigin
 @RestController
-@RequestMapping("api")
-public class LoginController {
+@RequestMapping("api/admin")
+public class AdminLoginController {
     /**
      * The logger of the login controller.
      */
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(LoginController.class);
+            LoggerFactory.getLogger(AdminLoginController.class);
 
     /**
      * Represents the login service.
@@ -41,26 +41,21 @@ public class LoginController {
     private final JwtService jwtService;
 
     /**
-     * Redirect to expo web but on production to admin web.
+     * Redirect to admin web.
      */
-    @Value("${redirect.web}")
-    private String redirectUrlWeb;
-
-    /**
-     * Redirect to the expo app.
-     */
-    @Value("${redirect.expo}")
-    private String redirectUrlExpo;
+    @Value("${redirect.admin.web}")
+    private String redirectUrlAdminWeb;
 
     /**
      * Creates a login controller.
      *
      * @param loginService the login service to manage the users.
-     * @param jwtService   represents the jwt service
+     * @param jwtService   represents the JWT service
      */
     @Autowired
-    public LoginController(final LoginService loginService,
-                           final JwtService jwtService) {
+    public AdminLoginController(
+            final LoginService loginService,
+            final JwtService jwtService) {
         this.loginService = loginService;
         this.jwtService = jwtService;
     }
@@ -81,14 +76,14 @@ public class LoginController {
     }
 
     /**
-     * The url to login on for users on a website.
+     * The url to login on for admins on the website.
      *
      * @param principal The user that logged in on Azure AD
      * @param response  The response that will be sent back to the user
      * @return a response entity
      */
-    @GetMapping("login/web")
-    public ResponseEntity<String> loginRedirectToWeb(
+    @GetMapping("login")
+    public ResponseEntity<String> loginRedirectToAdminWeb(
             @AuthenticationPrincipal final OAuth2User principal,
             final HttpServletResponse response) {
         Authentication authentication = loginService.login(principal);
@@ -96,35 +91,11 @@ public class LoginController {
 
         loginService.setCookieJSessionId(response);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} logged in on web and redirect",
+            LOGGER.debug("{} logged in on admin web and redirect",
                     principal.getName());
         }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(redirectUrlWeb + "?JWT=" + jwt))
+                .location(URI.create(redirectUrlAdminWeb + "?JWT=" + jwt))
                 .build();
-    }
-
-    /**
-     * The url to login on for users on an Android application.
-     *
-     * @param principal The user that logged in on Azure AD
-     * @param response  The response that will be sent back to the user
-     * @return a response entity
-     */
-    @GetMapping("login/expo")
-    public ResponseEntity<Void> loginRedirectToExpo(
-            @AuthenticationPrincipal final OAuth2User principal,
-            final HttpServletResponse response) {
-        Authentication authentication = loginService.login(principal);
-        String jwt = jwtService.generateToken(authentication);
-
-        loginService.setCookieJSessionId(response);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} logged in on expo and redirect",
-                    principal.getName());
-        }
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(redirectUrlExpo + "?JWT="
-                        + jwt)).build();
     }
 }

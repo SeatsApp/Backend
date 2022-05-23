@@ -1,5 +1,8 @@
 package com.seatapp.usermanagement.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seatapp.domain.Role;
 import com.seatapp.services.LoggerService;
 import com.seatapp.services.LoggerServiceImpl;
 import io.jsonwebtoken.Jwts;
@@ -11,10 +14,15 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Locale;
+
 
 @Component
 public class JwtServiceImpl implements JwtService {
@@ -46,6 +54,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateToken(final Authentication authentication) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", authentication.getAuthorities().toArray()[0]);
         return doGenerateToken(claims, authentication.getName());
     }
 
@@ -79,6 +88,26 @@ public class JwtServiceImpl implements JwtService {
     }
 
     /**
+     * Get role by JWT token.
+     *
+     * @param token the JWT token
+     * @return the role from the JWT token
+     */
+    @Override
+    public Role getRoleFromJwtToken(final String token) {
+        Object authority = Jwts.parser().setSigningKey(jwtSecret)
+                .parseClaimsJws(token).getBody().get("role");
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> authorityMap =
+                objectMapper.convertValue(authority,
+                        new TypeReference<
+                                LinkedHashMap<String, String>>() {
+                        });
+        String role = authorityMap.get("authority");
+        return Role.valueOf(role.toUpperCase(Locale.ROOT));
+    }
+
+    /**
      * Validate the JWT token.
      *
      * @param token the JWT token
@@ -108,5 +137,25 @@ public class JwtServiceImpl implements JwtService {
         }
 
         return false;
+    }
+
+    /**
+     * retrieves the JWT token out of the http request.
+     *
+     * @param request the request from which the JWT token
+     *                will be retrieved.
+     * @return the parsed JWT token
+     */
+    @Override
+    public String parseJwt(final HttpServletRequest request) {
+        String headerAuth = request.getHeader("Authorization");
+
+        String startOfAuthorization = "Bearer ";
+        if (StringUtils.hasText(headerAuth)
+                && headerAuth.startsWith(startOfAuthorization)) {
+            return headerAuth.substring(startOfAuthorization.length());
+        }
+
+        return null;
     }
 }
