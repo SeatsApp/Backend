@@ -103,6 +103,8 @@ jobs:
         env:
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           echo "Releasing to Amazon Lightsail"
 
@@ -129,6 +131,8 @@ jobs:
             \"environment\": {
               \"AZURE_CLIENT_SECRET\": \"${{ env.AZURE_CLIENT_SECRET }}\",
               \"JWT_SECRET\": \"${{ env.JWT_SECRET }}\",
+              \"DB_USER\": \"${{ env.DB_USER }}\",
+              \"DB_PASSWORD\": \"${{ env.DB_PASSWORD }}\",
               \"SPRING_PROFILES_ACTIVE\": \"prod\"
               },
             \"ports\": {
