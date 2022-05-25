@@ -103,7 +103,7 @@ public class SeatServiceImpl implements SeatService {
         }
 
         seat.addReservation(newReservation);
-        seatRepository.save(seat);
+        seat = seatRepository.save(seat);
         return seat;
     }
 
