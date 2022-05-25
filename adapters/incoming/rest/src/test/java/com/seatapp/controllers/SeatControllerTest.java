@@ -196,7 +196,7 @@ class SeatControllerTest {
     @Test
     void createSeat() throws Exception {
         // Arrange
-        SeatDto seatDto = new SeatDto(1L, "Test", null, null);
+        SeatDto seatDto = new SeatDto(1L, "Test", null, null, true);
 
         when(seatService.createSeat(any(Seat.class)))
                 .thenReturn(new Seat(1L, "Test", true,
@@ -224,7 +224,7 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithEmptyStringAsName() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, "", null, null);
+        SeatDto seatDto = new SeatDto(1L, "", null, null, true);
 
         mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper
@@ -236,7 +236,7 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithNameNull() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, null, null, null);
+        SeatDto seatDto = new SeatDto(1L, null, null, null, true);
 
         mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper
@@ -323,9 +323,9 @@ class SeatControllerTest {
                 reservationDto.getStartDateTime(),
                 reservationDto.getEndDateTime(),
                 new User());
-        when(seatService.reserve(1L, reservation))
+        when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenReturn(new Seat(1L, "Test",
-                        true, new ArrayList<>()));
+                        true, List.of(reservation)));
 
         mockMvc.perform(patch(apiSeatsUrl + 1L
                         + reserveString).with(authentication(authentication))
@@ -532,6 +532,14 @@ class SeatControllerTest {
                 .thenReturn(true);
 
         mockMvc.perform(patch("/api/seats/" + 1 + "/checkIn")
+                        .with(authentication(authentication))
+                        .header(authorizationString, bearerString + jwt))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void changeAvailability() throws Exception {
+        mockMvc.perform(patch("/api/seats/" + 1 + "/availability")
                         .with(authentication(authentication))
                         .header(authorizationString, bearerString + jwt))
                 .andExpect(status().isOk());

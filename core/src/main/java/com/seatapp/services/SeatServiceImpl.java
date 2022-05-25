@@ -63,6 +63,17 @@ public class SeatServiceImpl implements SeatService {
     }
 
     /**
+     * Disables a seat for reservations.
+     * @param seatId the id of the to be disabled seat.
+     */
+    @Override
+    public void changeAvailability(final Long seatId) {
+        Seat seat = getSeatById(seatId);
+        seat.setAvailable(!seat.isAvailable());
+        seatRepository.save(seat);
+    }
+
+    /**
      * Gets all the seats from database.
      *
      * @return a list of seats
@@ -103,7 +114,7 @@ public class SeatServiceImpl implements SeatService {
         }
 
         seat.addReservation(newReservation);
-        seatRepository.save(seat);
+        seat = seatRepository.save(seat);
         return seat;
     }
 

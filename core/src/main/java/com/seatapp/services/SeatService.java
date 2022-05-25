@@ -23,6 +23,12 @@ public interface SeatService {
     void delete(Long seatId);
 
     /**
+     * Disables a seat for reservations.
+     * @param seatId the id of the to be disabled seat.
+     */
+    void changeAvailability(Long seatId);
+
+    /**
      * Gets all the seats from database.
      *
      * @return a list of seats
@@ -64,5 +70,4 @@ public interface SeatService {
      * @param username username of the person wanting to check in.
      */
     void checkInOnSeat(Long seatId, String username);
-
 }

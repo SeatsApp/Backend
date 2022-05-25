@@ -84,6 +84,18 @@ public class SeatsController {
     }
 
     /**
+     * Makes a seat unavailable for reservations.
+     * @param seatId the id of the seat that has to be changed.
+     * @return Returns a responseEntity with the HttpStatus and a message.
+     */
+    @PatchMapping("{seatId}/availability")
+    public ResponseEntity<String> changeAvailability(
+            @PathVariable final Long seatId) {
+        seatService.changeAvailability(seatId);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * Takes all the seats from the database.
      *
      * @return Returns a responseEntity with the HttpStatus and the found seats.
@@ -128,7 +140,7 @@ public class SeatsController {
      * @return Returns a response with the HttpStatus and a message.
      */
     @PatchMapping("{seatId}/reserve")
-    public ResponseEntity<String>
+    public ResponseEntity<Long>
     reserveSeat(@PathVariable final Long seatId,
                 @RequestBody final
                 ReservationDto reservationDto,
@@ -140,8 +152,10 @@ public class SeatsController {
                 reservationDto.getStartDateTime(),
                 reservationDto.getEndDateTime(),
                 user);
-        seatService.reserve(seatId, reservation);
-        return ResponseEntity.ok().build();
+        Seat seat = seatService.reserve(seatId, reservation);
+
+        int lastIndex = seat.getReservations().size() - 1;
+        return ResponseEntity.ok(seat.getReservations().get(lastIndex).getId());
     }
 
     /**
