@@ -522,6 +522,47 @@ class SeatControllerTest {
     }
 
     @Test
+    void getSeatsWithReservationsByDateAndHours() throws Exception {
+        // Arrange
+        LocalDateTime startTimeNew = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_14, 0, 0);
+        LocalDateTime endTimeNew = LocalDateTime.of(DATE_YEAR,
+                DATE_MONTH, DATE_DAY, DATE_HOUR_17, 0, 0);
+
+        Seat seat1 = new Seat("Test1");
+        Reservation reservation = new Reservation(startTimeNew,
+                endTimeNew, VALID_USER);
+        reservation.setId(1L);
+        seat1.addReservation(reservation);
+        seat1.setId(1L);
+
+        when(seatService.getAllWithReservationsByDate(
+                LocalDate.of(DATE_YEAR,
+                        DATE_MONTH, DATE_DAY)))
+                .thenReturn(List.of(seat1));
+
+        List<SeatDto> seatDtos = Stream.of(seat1)
+                .map(seat -> SeatDto.build(seat,
+                        startTimeNew.toLocalDate()
+                                .atTime(DATE_HOUR_13, 0),
+                        startTimeNew.toLocalDate().atTime(0, 0)
+                                .plusHours(DATE_HOUR_17)))
+                .toList();
+        String json = objectMapper.writeValueAsString(seatDtos);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/seats/reservations/date/"
+                        + "2024-04-27/startHour/" + DATE_HOUR_13
+                        + "/endHour/" + DATE_HOUR_17)
+                        .with(authentication(authentication))
+                        .header(authorizationString, bearerString
+                                + jwt))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .json(json));
+    }
+
+    @Test
     void checkInSeat() throws Exception {
         Seat seat1 = new Seat("Test1");
         seat1.getReservations().add(new Reservation(

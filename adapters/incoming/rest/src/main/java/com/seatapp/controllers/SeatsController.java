@@ -120,6 +120,35 @@ public class SeatsController {
     }
 
     /**
+     * Takes all the seats from the database with the
+     * reservations from the given date and between the hours.
+     *
+     * @param date    the date where you want reservations from.
+     * @param startHour the start hour when you want to make a reservation.
+     * @param endHour the end hour until when you want to make a reservation.
+     * @return Returns a responseEntity with the HttpStatus and the found seats.
+     */
+    @GetMapping("reservations/date/{date}/startHour/{startHour}"
+            + "/endHour/{endHour}")
+    public ResponseEntity<List<SeatDto>>
+    getSeatsWithReservationsByDateAndHours(
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @PathVariable final LocalDate date,
+            @PathVariable final int startHour,
+            @PathVariable final int endHour) {
+        List<Seat> foundSeats = seatService
+                .getAllWithReservationsByDate(date);
+
+        List<SeatDto> seatDtos = foundSeats.stream()
+                .map(seat -> SeatDto.build(seat,
+                        date.atTime(startHour, 0),
+                        date.atTime(0, 0)
+                                .plusHours(endHour)))
+                .toList();
+        return ResponseEntity.ok(seatDtos);
+    }
+
+    /**
      * Reserves an existing seat.
      *
      * @param seatId         the Id of the to be reserved seat.
