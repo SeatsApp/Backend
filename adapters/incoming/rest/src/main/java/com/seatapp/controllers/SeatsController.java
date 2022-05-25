@@ -128,7 +128,7 @@ public class SeatsController {
      * @return Returns a response with the HttpStatus and a message.
      */
     @PatchMapping("{seatId}/reserve")
-    public ResponseEntity<String>
+    public ResponseEntity<Long>
     reserveSeat(@PathVariable final Long seatId,
                 @RequestBody final
                 ReservationDto reservationDto,
@@ -140,8 +140,10 @@ public class SeatsController {
                 reservationDto.getStartDateTime(),
                 reservationDto.getEndDateTime(),
                 user);
-        seatService.reserve(seatId, reservation);
-        return ResponseEntity.ok().build();
+        Seat seat = seatService.reserve(seatId, reservation);
+
+        int lastIndex = seat.getReservations().size() - 1;
+        return ResponseEntity.ok(seat.getReservations().get(lastIndex).getId());
     }
 
     /**

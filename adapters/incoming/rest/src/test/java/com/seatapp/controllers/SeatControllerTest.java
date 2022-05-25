@@ -323,9 +323,9 @@ class SeatControllerTest {
                 reservationDto.getStartDateTime(),
                 reservationDto.getEndDateTime(),
                 new User());
-        when(seatService.reserve(1L, reservation))
+        when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenReturn(new Seat(1L, "Test",
-                        true, new ArrayList<>()));
+                        true, List.of(reservation)));
 
         mockMvc.perform(patch(apiSeatsUrl + 1L
                         + reserveString).with(authentication(authentication))
