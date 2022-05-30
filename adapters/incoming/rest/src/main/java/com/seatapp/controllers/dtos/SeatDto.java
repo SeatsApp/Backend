@@ -32,6 +32,36 @@ public class SeatDto {
     private SeatStatusDto seatStatus;
 
     /**
+     * Represents the x coordinates in centimeter
+     * for generating the svg.
+     */
+    private int xCoordinates;
+
+    /**
+     * Represents the y coordinates in centimeter
+     * for generating the svg.
+     */
+    private int yCoordinates;
+
+    /**
+     * Represents the width in centimeter
+     * for generating the svg.
+     */
+    private int width;
+
+    /**
+     * Represents the height in centimeter
+     * for generating the svg.
+     */
+    private int height;
+
+    /**
+     * Represents the floor id of the floor
+     * in which the seat exists.
+     */
+    private long floorId;
+
+    /**
      * Represents the reservation of the seat.
      */
     private List<ReservationDto> reservations;
@@ -53,6 +83,11 @@ public class SeatDto {
         return new SeatDto(seat.getId(),
                 seat.getName(),
                 null,
+                seat.getXCoordinates(),
+                seat.getYCoordinates(),
+                seat.getWidth(),
+                seat.getHeight(),
+                0,
                 seat.getReservations().stream()
                         .map(ReservationDto::build)
                         .toList(), seat.isAvailable());
@@ -77,6 +112,11 @@ public class SeatDto {
         return new SeatDto(seat.getId(),
                 seat.getName(),
                 status,
+                seat.getXCoordinates(),
+                seat.getYCoordinates(),
+                seat.getWidth(),
+                seat.getHeight(),
+                0,
                 seat.getReservations().stream()
                         .map(ReservationDto::build)
                         .toList(), seat.isAvailable());
