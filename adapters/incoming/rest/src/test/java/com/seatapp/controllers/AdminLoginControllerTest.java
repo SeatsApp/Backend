@@ -1,5 +1,6 @@
 package com.seatapp.controllers;
 
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import com.seatapp.repositories.UserRepository;
 import com.seatapp.usermanagement.services.JwtService;
@@ -79,7 +80,7 @@ class AdminLoginControllerTest {
                         new SimpleGrantedAuthority(
                                 "ADMIN"))));
         when(userRepository.findByEmail("test"))
-                .thenReturn(new User());
+                .thenReturn(new User("test", "test", "testje", Role.ADMIN));
 
         // Arrange
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
@@ -101,7 +102,8 @@ class AdminLoginControllerTest {
                         new SimpleGrantedAuthority(
                                 "USER"))));
         when(userRepository.findByEmail("test"))
-                .thenReturn(new User());
+                .thenReturn(new User("test", "test",
+                        "testName", Role.USER));
 
         // Arrange
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)

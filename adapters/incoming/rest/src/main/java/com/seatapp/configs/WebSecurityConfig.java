@@ -2,6 +2,7 @@ package com.seatapp.configs;
 
 import com.seatapp.filters.AdminFilter;
 import com.seatapp.filters.JwtAuthorizationFilter;
+import com.seatapp.services.UserService;
 import com.seatapp.usermanagement.services.JwtService;
 import com.seatapp.usermanagement.services.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +43,21 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * The service to authenticate the JWT token.
      */
     private final JwtService jwtServiceImpl;
+    /**
+     * The service to authenticate the JWT token.
+     */
+    private final UserService userService;
 
     @Autowired
     WebSecurityConfig(final JwtUserDetailsService userDetailsService,
                       final OAuth2UserService<OidcUserRequest,
                               OidcUser> oidcUserService,
-                      final JwtService jwtServiceImpl) {
+                      final JwtService jwtServiceImpl,
+                      final UserService userService) {
         this.userDetailsService = userDetailsService;
         this.oidcUserService = oidcUserService;
         this.jwtServiceImpl = jwtServiceImpl;
+        this.userService = userService;
     }
 
     @Override
@@ -108,9 +115,9 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/admin/login"))
                 .addFilter(new AdminFilter(authenticationManager(),
                         jwtServiceImpl,
-                        "POST /api/seats",
+                        userService, "POST /api/seats",
                         "DELETE /api/seats",
-                        "GET /api/admin/healthcheck"))
+                        "GET /api/admin/healthcheck", "PATCH /api/users"))
                 .authorizeRequests()
                 .antMatchers("/api/login/**",
                         "/api/admin/login/**").authenticated()

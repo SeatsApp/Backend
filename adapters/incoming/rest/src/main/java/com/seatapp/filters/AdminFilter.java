@@ -1,6 +1,8 @@
 package com.seatapp.filters;
 
 import com.seatapp.domain.Role;
+import com.seatapp.domain.User;
+import com.seatapp.services.UserService;
 import com.seatapp.usermanagement.services.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +23,11 @@ public class AdminFilter extends BasicAuthenticationFilter {
     private final JwtService jwtService;
 
     /**
+     * The service that contains the users.
+     */
+    private final UserService userService;
+
+    /**
      * First the http method with a space and then
      * the path on which the filtering will be done.
      * <p>
@@ -30,25 +37,26 @@ public class AdminFilter extends BasicAuthenticationFilter {
 
     /**
      * Creates the admin filter.
-     *
-     * @param authenticationManager            represents
+     *  @param authenticationManager            represents
      *                                         the authorization manager
      * @param jwtService                       the service which handles the
      *                                         authentication and creation of
      *                                         the JWT tokens
+     * @param userService
      * @param incHttpMethodAndPathForFiltering first the http method with
      *                                         a space and then
      *                                         the paths on which the filtering
      *                                         will be done
      *                                         <p>
-     *                                         Example: POST /api/seats
      */
     public AdminFilter(
             final AuthenticationManager authenticationManager,
             final JwtService jwtService,
+            final UserService userService,
             final String... incHttpMethodAndPathForFiltering) {
         super(authenticationManager);
         this.jwtService = jwtService;
+        this.userService = userService;
         this.includedHttpMethodAndPathForFiltering =
                 Arrays.stream(incHttpMethodAndPathForFiltering).toList();
     }
@@ -75,9 +83,11 @@ public class AdminFilter extends BasicAuthenticationFilter {
 
         if (includedInFilter) {
             String jwt = jwtService.parseJwt(request);
-            Role role = jwtService.getRoleFromJwtToken(jwt);
+            String email = jwtService.getEmailFromJwtToken(jwt);
 
-            if (!role.equals(Role.ADMIN)) {
+            User user = userService.getByEmail(email);
+
+            if (!user.getRole().equals(Role.ADMIN)) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }

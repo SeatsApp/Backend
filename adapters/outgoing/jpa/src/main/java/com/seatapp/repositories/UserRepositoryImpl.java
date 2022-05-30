@@ -6,6 +6,7 @@ import com.seatapp.exceptions.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -49,6 +50,19 @@ public class UserRepositoryImpl implements UserRepository {
         return entityOptional.map(UserEntity::toUser)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "This user doesn't exist."));
+    }
+
+    /**
+     * Gets all the users from database.
+     *
+     * @return a list of user
+     */
+    @Override
+    public List<User> findAll() {
+        List<UserEntity> entities = repository.findAll();
+
+        return entities.stream().map(
+                UserEntity::toUser).toList();
     }
 
     /**

@@ -6,6 +6,8 @@ import com.seatapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -47,6 +49,16 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Gets all the users from database.
+     *
+     * @return a list of users
+     */
+    @Override
+    public List<User> getAll() {
+        return userRepository.findAll();
+    }
+
+    /**
      * Creates a new User.
      *
      * @param email    the email of the new user
@@ -62,5 +74,23 @@ public class UserServiceImpl implements UserService {
                            final Role role) {
         return userRepository.save(
                 new User(email, password, fullName, role));
+    }
+
+    /**
+     * Changes the role of a user.
+     * @param user the to be changed user and the new role.
+     * @param email the email of the user who wants to change the user.
+     * @return the user with updated role.
+     */
+    @Override
+    public User changeUserRole(final User user,
+                               final String email) {
+        if (user.getEmail().equals(email)) {
+            throw new IllegalArgumentException(
+                    "A user can't change it's own role.");
+        }
+        User foundUser = getByEmail(user.getEmail());
+        foundUser.setRole(user.getRole());
+        return userRepository.save(foundUser);
     }
 }
