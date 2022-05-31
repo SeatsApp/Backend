@@ -1,5 +1,6 @@
 package com.seatapp.controllers.dtos;
 
+import com.seatapp.domain.Role;
 import com.seatapp.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,11 @@ public class UserDto {
     private String fullName;
 
     /**
+     * Represents the role of the user.
+     */
+    private Role role;
+
+    /**
      * This method converts a user to a userDto.
      *
      * @param user the to be converted user
@@ -29,6 +35,6 @@ public class UserDto {
      */
     public static UserDto build(final User user) {
         return new UserDto(
-                user.getEmail(), user.getFullName());
+                user.getEmail(), user.getFullName(), user.getRole());
     }
 }

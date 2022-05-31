@@ -2,6 +2,8 @@ package com.seatapp.repositories;
 
 import com.seatapp.domain.User;
 
+import java.util.List;
+
 public interface UserRepository {
     /**
      * Saves the user in the database.
@@ -19,6 +21,14 @@ public interface UserRepository {
      * @return the optional user
      */
     User findByEmail(String email);
+
+    /**
+     * Get all the user from the database.
+     *
+     * @return all the users from the database
+     * in a list
+     */
+    List<User> findAll();
 
     /**
      * Check if the user exists.

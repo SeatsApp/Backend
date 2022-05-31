@@ -43,8 +43,8 @@ public class UserEntity {
      * @return a user entity
      */
     public static UserEntity build(final User user) {
-        return new UserEntity(user.getEmail(), user.getFullName(),
-                user.getPassword(), user.getRole());
+        return new UserEntity(user.getEmail(), user.getPassword(),
+                user.getFullName(), user.getRole());
     }
 
     /**
@@ -53,6 +53,7 @@ public class UserEntity {
      */
     public User toUser() {
         return new User(this.getEmail(),
-                this.getFullName(), this.getPassword(), this.getRole());
+                 this.getPassword(), this.getFullName(),
+                this.getRole());
     }
 }

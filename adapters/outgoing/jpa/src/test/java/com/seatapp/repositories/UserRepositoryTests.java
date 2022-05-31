@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @SpringBootTest
 class UserRepositoryTests {
@@ -82,5 +83,20 @@ class UserRepositoryTests {
 
         //Assert
         assertFalse(found);
+    }
+
+    @Test
+    @Transactional
+    void findAll() {
+        //Arrange
+        User savedUser = userRepository.save(VALID_USER);
+        savedUser.setEmail("Testje");
+        userRepository.save(savedUser);
+
+        //Act
+        List<User> foundUser = userRepository.findAll();
+
+        //Assert
+        assertEquals(2, foundUser.size());
     }
 }
