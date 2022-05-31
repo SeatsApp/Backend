@@ -37,6 +37,11 @@ public class SeatDto {
     private List<ReservationDto> reservations;
 
     /**
+     * Represents if the seat is available for reservations.
+     */
+    private boolean available;
+
+    /**
      * This method converts a seat to a seatDto without
      * giving the seats a status.
      *
@@ -50,7 +55,7 @@ public class SeatDto {
                 null,
                 seat.getReservations().stream()
                         .map(ReservationDto::build)
-                        .toList());
+                        .toList(), seat.isAvailable());
     }
 
     /**
@@ -74,7 +79,7 @@ public class SeatDto {
                 status,
                 seat.getReservations().stream()
                         .map(ReservationDto::build)
-                        .toList());
+                        .toList(), seat.isAvailable());
     }
 
     /**

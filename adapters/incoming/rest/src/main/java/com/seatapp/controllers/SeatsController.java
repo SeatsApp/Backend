@@ -84,6 +84,18 @@ public class SeatsController {
     }
 
     /**
+     * Makes a seat unavailable for reservations.
+     * @param seatId the id of the seat that has to be changed.
+     * @return Returns a responseEntity with the HttpStatus and a message.
+     */
+    @PatchMapping("{seatId}/availability")
+    public ResponseEntity<String> changeAvailability(
+            @PathVariable final Long seatId) {
+        seatService.changeAvailability(seatId);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * Takes all the seats from the database.
      *
      * @return Returns a responseEntity with the HttpStatus and the found seats.

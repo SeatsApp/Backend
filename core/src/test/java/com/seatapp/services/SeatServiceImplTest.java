@@ -362,4 +362,20 @@ class SeatServiceImplTest {
         assertEquals(1L, seats.get(0).getReservations().get(0).getId());
         assertEquals(1, seats.get(0).getReservations().size());
     }
+
+    @Test
+    void changeAvailability() {
+        //given
+        Seat seat = new Seat("Seat1");
+        seat.setId(1L);
+
+        given(seatRepository.findById(
+                seat.getId())).willReturn(seat);
+
+        //act
+        seatService.changeAvailability(seat.getId());
+
+        //assert
+        assertFalse(seat.isAvailable());
+    }
 }
