@@ -39,22 +39,34 @@ public class SeatEntity {
     private boolean available;
 
     /**
+     * Represents the x coordinates in centimeter
+     * for generating the svg.
+     */
+    private int xCoordinates;
+
+    /**
+     * Represents the y coordinates in centimeter
+     * for generating the svg.
+     */
+    private int yCoordinates;
+
+    /**
+     * Represents the width in centimeter
+     * for generating the svg.
+     */
+    private int width;
+
+    /**
+     * Represents the height in centimeter
+     * for generating the svg.
+     */
+    private int height;
+
+    /**
      * Represents the reservations a seat.
      */
     @OneToMany(cascade = CascadeType.ALL)
     private List<ReservationEntity> reservations;
-
-    /**
-     * Creates a seat with a specified name.
-     *
-     * @param name         The seats' name
-     * @param reservations the seats' reservations
-     */
-    public SeatEntity(final String name,
-                      final List<ReservationEntity> reservations) {
-        this.name = name;
-        this.reservations = reservations;
-    }
 
     /**
      * This method converts a seat to a seatEntity.
@@ -65,6 +77,10 @@ public class SeatEntity {
     public static SeatEntity build(final Seat seat) {
         return new SeatEntity(seat.getId(), seat.getName(),
                 seat.isAvailable(),
+                seat.getXCoordinates(),
+                seat.getYCoordinates(),
+                seat.getWidth(),
+                seat.getHeight(),
                 seat.getReservations().stream()
                         .map(ReservationEntity::build)
                         .collect(Collectors.toList()));
@@ -78,6 +94,10 @@ public class SeatEntity {
     public Seat toSeat() {
         return new Seat(this.getId(), this.getName(),
                 this.isAvailable(),
+                this.getXCoordinates(),
+                this.getYCoordinates(),
+                this.getWidth(),
+                this.getHeight(),
                 getReservations().stream()
                         .map(ReservationEntity::toReservation)
                         .collect(Collectors.toList()));

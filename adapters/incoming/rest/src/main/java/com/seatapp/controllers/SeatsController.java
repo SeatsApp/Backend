@@ -2,24 +2,26 @@ package com.seatapp.controllers;
 
 import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
+import com.seatapp.domain.Floor;
 import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Seat;
 import com.seatapp.domain.User;
+import com.seatapp.services.FloorService;
 import com.seatapp.services.SeatService;
 import com.seatapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -43,16 +45,24 @@ public class SeatsController {
     private final UserService userService;
 
     /**
+     * Represents the floor service that is called.
+     */
+    private final FloorService floorService;
+
+    /**
      * Creates the controller with a specified service.
      *
-     * @param seatService the seatService
-     * @param userService the userService
+     * @param seatService  the seatService
+     * @param userService  the userService
+     * @param floorService the floorService
      */
     @Autowired
     public SeatsController(final SeatService seatService,
-                           final UserService userService) {
+                           final UserService userService,
+                           final FloorService floorService) {
         this.seatService = seatService;
         this.userService = userService;
+        this.floorService = floorService;
     }
 
     /**
@@ -64,8 +74,12 @@ public class SeatsController {
     @PostMapping
     public ResponseEntity<String> createSeat(
             @RequestBody final SeatDto seatDto) {
-        Seat seat = new Seat(seatDto.getName());
+        Seat seat = new Seat(seatDto.getName(), seatDto.getXCoordinates(),
+                seatDto.getYCoordinates(), seatDto.getWidth(),
+                seatDto.getHeight());
+        Floor floor = floorService.findById(seatDto.getFloorId());
         Seat createdSeat = seatService.createSeat(seat);
+        floorService.addSeat(floor, createdSeat);
         return ResponseEntity.created(URI.create("/api/seats/"
                 + createdSeat.getId())).build();
     }

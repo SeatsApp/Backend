@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatapp.controllers.dtos.ReservationDto;
 import com.seatapp.controllers.dtos.SeatDto;
 import com.seatapp.controllers.dtos.UserDto;
+import com.seatapp.domain.Seat;
+import com.seatapp.domain.Floor;
 import com.seatapp.domain.Reservation;
 import com.seatapp.domain.Role;
-import com.seatapp.domain.Seat;
 import com.seatapp.domain.User;
 import com.seatapp.repositories.UserRepository;
+import com.seatapp.services.FloorService;
 import com.seatapp.services.SeatService;
 import com.seatapp.services.UserService;
 import com.seatapp.usermanagement.services.JwtService;
@@ -164,6 +166,12 @@ class SeatControllerTest {
     private UserRepository userRepository;
 
     /**
+     * Represents the mocked floor service.
+     */
+    @MockBean(name = "floorServiceImpl")
+    private FloorService floorService;
+
+    /**
      * This method sets up necessary items for the tests.
      */
     @BeforeEach
@@ -196,11 +204,15 @@ class SeatControllerTest {
     @Test
     void createSeat() throws Exception {
         // Arrange
-        SeatDto seatDto = new SeatDto(1L, "Test", null, null, true);
+        SeatDto seatDto = new SeatDto(1L, "Test", null,
+                0, 0, 0, 0, 0, null, true);
 
         when(seatService.createSeat(any(Seat.class)))
                 .thenReturn(new Seat(1L, "Test", true,
+                        0, 0, 0, 0,
                         new ArrayList<>()));
+
+        when(floorService.findById(0)).thenReturn(new Floor());
 
         // Act & Assert
         mockMvc.perform(post(apiSeatsUrl)
@@ -224,7 +236,8 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithEmptyStringAsName() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, "", null, null, true);
+        SeatDto seatDto = new SeatDto(1L, "", null,
+                0, 0, 0, 0, 0, null, true);
 
         mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper
@@ -236,7 +249,8 @@ class SeatControllerTest {
 
     @Test
     void createSeatWithNameNull() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, null, null, null, true);
+        SeatDto seatDto = new SeatDto(1L, null, null,
+                0, 0, 0, 0, 0, null, true);
 
         mockMvc.perform(post(apiSeatsUrl)
                         .content(objectMapper
@@ -282,9 +296,11 @@ class SeatControllerTest {
     void getSeats() throws Exception {
         when(seatService.getAll()).thenReturn(List.of(
                 new Seat(1L, "Test1",
-                        true, new ArrayList<>()),
+                        true, 0, 0,
+                        0, 0, new ArrayList<>()),
                 new Seat(2L, "Test2",
-                        true, new ArrayList<>())));
+                        true, 0, 0,
+                        0, 0, new ArrayList<>())));
 
         mockMvc.perform(get(apiSeatsUrl)
                         .with(authentication(authentication))
@@ -325,7 +341,8 @@ class SeatControllerTest {
                 new User());
         when(seatService.reserve(eq(1L), any(Reservation.class)))
                 .thenReturn(new Seat(1L, "Test",
-                        true, List.of(reservation)));
+                        true, 0, 0,
+                        0, 0, List.of(reservation)));
 
         mockMvc.perform(patch(apiSeatsUrl + 1L
                         + reserveString).with(authentication(authentication))

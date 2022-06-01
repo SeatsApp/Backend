@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,10 +26,10 @@ class SeatRepositoryTests {
      */
     private static final Seat VALID_SEAT = new Seat(
             "TestSeat", new ArrayList<>(
-                    List.of(new Reservation(LocalDateTime.now(),
-                            LocalDateTime.now().plusHours(2),
-                            new User("test", "test",
-                                    "test", Role.ADMIN)))));
+            List.of(new Reservation(LocalDateTime.now(),
+                    LocalDateTime.now().plusHours(2),
+                    new User("test", "test",
+                            "test", Role.ADMIN)))));
 
     /**
      * The seatRepositoryImplementation.
@@ -77,8 +78,7 @@ class SeatRepositoryTests {
     void findAllSeats() {
         //Arrange
         seatRepository.save(VALID_SEAT);
-        seatRepository.save(new Seat(2L, "Test",
-                true, new ArrayList<>()));
+        seatRepository.save(new Seat("Test"));
 
         //Act
         List<Seat> foundSeats = seatRepository.findAll();
@@ -116,7 +116,8 @@ class SeatRepositoryTests {
         //Arrange
         seatRepository.save(VALID_SEAT);
         seatRepository.save(new Seat(2L, "Test",
-                true, new ArrayList<>()));
+                true, 0, 0,
+                0, 0, new ArrayList<>()));
 
         //Act
         seatRepository.deleteAll();

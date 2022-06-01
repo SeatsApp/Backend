@@ -86,7 +86,8 @@ class SeatServiceImplTest {
 
         //Assert
         Seat expectedSeat = new Seat(1L, "Test",
-                true, null);
+                true, 0, 0,
+                0, 0, null);
         assertEquals(expectedSeat.getId(), savedSeat.getId());
         assertEquals(expectedSeat.getName(), savedSeat.getName());
     }
@@ -259,7 +260,8 @@ class SeatServiceImplTest {
     void reserveUnavailableSeatTest() {
         // Arrange
         when(seatRepository.findById(1L)).thenReturn(new Seat(1L,
-                "Test", false, new ArrayList<>()));
+                "Test", false, 0, 0,
+                0, 0, new ArrayList<>()));
         when(seatRepository.save(Mockito.any(Seat.class)))
                 .thenAnswer(i -> {
                     Seat seat = i.getArgument(0);

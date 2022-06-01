@@ -28,6 +28,30 @@ public class Seat {
     private boolean available;
 
     /**
+     * Represents the x coordinates in centimeter
+     * for generating the svg.
+     */
+    private int xCoordinates;
+
+    /**
+     * Represents the y coordinates in centimeter
+     * for generating the svg.
+     */
+    private int yCoordinates;
+
+    /**
+     * Represents the width in centimeter
+     * for generating the svg.
+     */
+    private int width;
+
+    /**
+     * Represents the height in centimeter
+     * for generating the svg.
+     */
+    private int height;
+
+    /**
      * Represents the reservations a seat.
      */
     private List<Reservation> reservations;
@@ -52,6 +76,27 @@ public class Seat {
     public Seat(final String name, final List<Reservation> reservations) {
         this.name = name;
         this.reservations = reservations;
+        this.available = true;
+    }
+
+    /**
+     * Creates a seat with a specified name.
+     *
+     * @param name         The seats' name
+     * @param xCoordinates the x coordinates in the svg
+     * @param yCoordinates the y coordinates in the svg
+     * @param width        the width in the svg
+     * @param height       the height in the svg
+     */
+    public Seat(final String name,
+                final int xCoordinates, final int yCoordinates,
+                final int width, final int height) {
+        this.name = name;
+        this.xCoordinates = xCoordinates;
+        this.yCoordinates = yCoordinates;
+        this.width = width;
+        this.height = height;
+        this.reservations = new ArrayList<>();
         this.available = true;
     }
 
