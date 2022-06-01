@@ -88,7 +88,7 @@ public class SeatsController {
      * Deletes a seat with a certain id.
      *
      * @param seatId the id of the to be deleted seat.
-     * @return Returns a responseEntity with the HttpStatus and a message.
+     * @return Returns a responseEntity with the HttpStatus.
      */
     @DeleteMapping("{seatId}")
     public ResponseEntity<String> deleteSeat(

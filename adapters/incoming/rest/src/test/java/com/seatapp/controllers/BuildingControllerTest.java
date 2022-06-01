@@ -1,5 +1,7 @@
 package com.seatapp.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seatapp.controllers.dtos.BuildingDto;
 import com.seatapp.domain.Seat;
 import com.seatapp.domain.Building;
 import com.seatapp.domain.Floor;
@@ -31,9 +33,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -71,6 +76,12 @@ class BuildingControllerTest {
     private WebApplicationContext context;
 
     /**
+     * Represents objectMapper for json conversions.
+     */
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    /**
      * Authentication token used in the tests.
      */
     private UsernamePasswordAuthenticationToken authentication;
@@ -87,6 +98,11 @@ class BuildingControllerTest {
             new User("User@Test.be",
                     "User1",
                     "User1", Role.ADMIN);
+
+    /**
+     * Loading in the data for the floor id.
+     */
+    private static final long FLOOR_ID3 = 3;
 
     /**
      * Represents the mocked user repository.
@@ -109,6 +125,16 @@ class BuildingControllerTest {
      * Variable to prevent repetitive strings in code.
      */
     private String bearerString;
+
+    /**
+     * Loading in the data for the building name.
+     */
+    private static final String BUILDING_NAME1 = "Building 1";
+
+    /**
+     * Loading in the data for the floor name.
+     */
+    private static final String FLOOR_NAME1 = "Floor 1";
 
     @BeforeEach
     void setup() {
@@ -147,10 +173,10 @@ class BuildingControllerTest {
                         new User(),
                         false)));
 
-        Floor floor = new Floor(2L, "Floor 1",
+        Floor floor = new Floor(2L, FLOOR_NAME1,
                 new ArrayList<>(), List.of(seat));
 
-        Building building = new Building(1L, "Building 1",
+        Building building = new Building(1L, BUILDING_NAME1,
                 List.of(floor));
 
         when(buildingService.getByIdAndFloorId(
@@ -158,7 +184,7 @@ class BuildingControllerTest {
                 .thenReturn(building);
 
         // Act & Assert
-        mockMvc.perform(get("/api/buildings/1?floorId=2")
+        mockMvc.perform(get("/api/buildings/1/floors/2")
                         .with(authentication(authentication))
                         .header(authorizationString,
                                 bearerString + jwt)
@@ -179,10 +205,10 @@ class BuildingControllerTest {
                         new User(),
                         false)));
 
-        Floor floor = new Floor(2L, "Floor 1",
+        Floor floor = new Floor(2L, FLOOR_NAME1,
                 new ArrayList<>(), List.of(seat));
 
-        Building building = new Building(1L, "Building 1",
+        Building building = new Building(1L, BUILDING_NAME1,
                 List.of(floor));
 
         when(buildingService.getByIdAndFloorIdAndDate(
@@ -191,7 +217,7 @@ class BuildingControllerTest {
 
         // Act & Assert
         mockMvc.perform(get(
-                        "/api/buildings/1?floorId=2&date="
+                        "/api/buildings/1/floors/2?date="
                                 + LocalDate.now())
                         .with(authentication(authentication))
                         .header(authorizationString,
@@ -201,6 +227,118 @@ class BuildingControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void getBuildingByIdTest() throws Exception {
+        // Arrange
+        Seat seat = new Seat("Test");
+        seat.setReservations(List.of(
+                new Reservation(1L,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        false,
+                        new User(),
+                        false)));
+
+        Floor floor = new Floor(2L, FLOOR_NAME1,
+                new ArrayList<>(), List.of(seat));
+
+        Building building = new Building(1L, BUILDING_NAME1,
+                List.of(floor));
+
+        when(buildingService.getById(1L))
+                .thenReturn(building);
+
+        // Act & Assert
+        mockMvc.perform(get(
+                        "/api/buildings/1")
+                        .with(authentication(authentication))
+                        .header(authorizationString,
+                                bearerString + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void postBuilding() throws Exception {
+        // Arrange
+        Seat seat = new Seat("Test");
+        seat.setReservations(List.of(
+                new Reservation(1L,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        false,
+                        new User(),
+                        false)));
+
+        Floor floor1 = new Floor(2L, FLOOR_NAME1,
+                new ArrayList<>(), List.of(seat));
+
+        Floor floor2 = new Floor(FLOOR_ID3, FLOOR_NAME1,
+                new ArrayList<>(), List.of(seat));
+
+        Building buildingContent = new Building(1L, BUILDING_NAME1,
+                List.of(floor1, floor2));
+
+        BuildingDto buildingDto = BuildingDto.build(buildingContent);
+
+        when(buildingService.createBuilding(any(Building.class)))
+                .thenReturn(buildingContent);
+
+        // Act & Assert
+        mockMvc.perform(post(
+                        "/api/buildings")
+                        .with(authentication(authentication))
+                        .content(objectMapper
+                                .writeValueAsString(buildingDto))
+                        .header(authorizationString,
+                                bearerString + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void patchBuilding() throws Exception {
+        // Arrange
+        Seat seat = new Seat("Test");
+        seat.setReservations(List.of(
+                new Reservation(1L,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        false,
+                        new User(),
+                        false)));
+
+        Floor floor1 = new Floor(2L, FLOOR_NAME1,
+                new ArrayList<>(), List.of(seat));
+
+        Floor floor2 = new Floor(FLOOR_ID3, FLOOR_NAME1,
+                new ArrayList<>(), List.of(seat));
+
+        Building building = new Building(1L, BUILDING_NAME1,
+                List.of(floor1));
+
+        Building buildingContent = new Building(1L, BUILDING_NAME1,
+                List.of(floor1, floor2));
+
+        BuildingDto buildingDto = BuildingDto.build(buildingContent);
+
+        when(buildingService.getById(1L))
+                .thenReturn(building);
+
+        // Act & Assert
+        mockMvc.perform(patch(
+                        "/api/buildings/1")
+                        .with(authentication(authentication))
+                        .content(objectMapper
+                                .writeValueAsString(buildingDto))
+                        .header(authorizationString,
+                                bearerString + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 
     @Test
     void getBuildings() throws Exception {
@@ -214,10 +352,10 @@ class BuildingControllerTest {
                         new User(),
                         false)));
 
-        Floor floor = new Floor(2L, "Floor 1",
+        Floor floor = new Floor(2L, FLOOR_NAME1,
                 List.of(new Point(0, 0)), List.of(seat));
 
-        Building building = new Building(1L, "Building 1",
+        Building building = new Building(1L, BUILDING_NAME1,
                 List.of(floor));
 
         when(buildingService.getAll())

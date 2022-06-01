@@ -31,4 +31,14 @@ public class PointDto {
         return new PointDto(point.getFirstPoint(),
                 point.getSecondPoint());
     }
+
+    /**
+     * This method converts a pointDto to a point.
+     *
+     * @return a point
+     */
+    public Point toPoint() {
+        return new Point(this.getFirstPoint(),
+                this.getSecondPoint());
+    }
 }

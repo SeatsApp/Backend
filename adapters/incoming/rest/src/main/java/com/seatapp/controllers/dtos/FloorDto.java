@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -46,5 +47,18 @@ public class FloorDto {
                         .map(PointDto::build).toList(),
                 floor.getSeats().stream()
                         .map(SeatDto::build).toList());
+    }
+
+    /**
+     * This method converts a floorDto to a floor.
+     *
+     * @return a floor
+     */
+    public Floor toFloor() {
+        return new Floor(this.getId(), this.getName(),
+                this.getPoints().stream()
+                        .map(PointDto::toPoint)
+                        .toList(),
+                new ArrayList<>());
     }
 }
