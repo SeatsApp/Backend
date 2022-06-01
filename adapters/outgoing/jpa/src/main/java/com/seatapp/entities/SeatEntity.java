@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "Seat")
@@ -83,7 +82,7 @@ public class SeatEntity {
                 seat.getHeight(),
                 seat.getReservations().stream()
                         .map(ReservationEntity::build)
-                        .collect(Collectors.toList()));
+                        .toList());
     }
 
     /**
@@ -100,6 +99,6 @@ public class SeatEntity {
                 this.getHeight(),
                 getReservations().stream()
                         .map(ReservationEntity::toReservation)
-                        .collect(Collectors.toList()));
+                        .toList());
     }
 }

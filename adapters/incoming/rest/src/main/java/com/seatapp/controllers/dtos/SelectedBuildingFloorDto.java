@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SelectedBuildingDto {
+public class SelectedBuildingFloorDto {
     /**
      * Represents the building id.
      */
@@ -50,13 +50,13 @@ public class SelectedBuildingDto {
      * @param building the to be converted building
      * @return a building dto
      */
-    public static SelectedBuildingDto build(final Building building) {
+    public static SelectedBuildingFloorDto build(final Building building) {
         Floor floor = building.getFloors().stream().findFirst()
                 .orElseThrow(() ->
                         new EntityNotFoundException(
                                 "Floor does not exist"));
 
-        return new SelectedBuildingDto(building.getId(),
+        return new SelectedBuildingFloorDto(building.getId(),
                 building.getName(),
                 floor.getId(),
                 floor.getName(),
@@ -75,14 +75,14 @@ public class SelectedBuildingDto {
      * @param date     the date for determining the seat status
      * @return a building dto
      */
-    public static SelectedBuildingDto build(final Building building,
-                                            final LocalDate date) {
+    public static SelectedBuildingFloorDto build(final Building building,
+                                                 final LocalDate date) {
         Floor floor = building.getFloors().stream().findFirst()
                 .orElseThrow(() ->
                         new EntityNotFoundException(
                                 "Floor does not exist"));
 
-        return new SelectedBuildingDto(building.getId(),
+        return new SelectedBuildingFloorDto(building.getId(),
                 building.getName(),
                 floor.getId(),
                 floor.getName(),
