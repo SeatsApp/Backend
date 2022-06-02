@@ -111,7 +111,10 @@ public class Seat {
                         .filter(reservation -> !reservation.isCancelled())
                         .toList());
         if (newReservation.isValidNewReservation(filteredReservations)) {
-            this.reservations.add(newReservation);
+            List<Reservation> newReservations =
+                    new ArrayList<>(getReservations());
+            newReservations.add(newReservation);
+            this.setReservations(newReservations);
         } else {
             throw new IllegalArgumentException("The reservation is not valid");
         }
