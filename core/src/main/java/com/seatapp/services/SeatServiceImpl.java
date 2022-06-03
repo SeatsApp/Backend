@@ -64,6 +64,7 @@ public class SeatServiceImpl implements SeatService {
 
     /**
      * Disables a seat for reservations.
+     *
      * @param seatId the id of the to be disabled seat.
      */
     @Override
@@ -187,5 +188,24 @@ public class SeatServiceImpl implements SeatService {
 
         reservation.checkIn(username);
         seatRepository.save(seat);
+    }
+
+    /**
+     * Update the seat with id by the object seat.
+     *
+     * @param seatId the seat id of the seat that will be updated
+     * @param seat the seat with the data to update the given seat with id
+     * @return the updated seat
+     */
+    @Override
+    public Seat updateSeat(final Long seatId,
+                           final Seat seat) {
+        Seat foundSeat = seatRepository.findById(seatId);
+        foundSeat.setName(seat.getName());
+        foundSeat.setXCoordinates(seat.getXCoordinates());
+        foundSeat.setYCoordinates(seat.getYCoordinates());
+        foundSeat.setWidth(seat.getWidth());
+        foundSeat.setHeight(seat.getHeight());
+        return seatRepository.save(foundSeat);
     }
 }

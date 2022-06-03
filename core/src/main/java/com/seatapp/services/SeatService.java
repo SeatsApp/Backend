@@ -70,4 +70,13 @@ public interface SeatService {
      * @param username username of the person wanting to check in.
      */
     void checkInOnSeat(Long seatId, String username);
+
+    /**
+     * Update the seat with id by the object seat.
+     *
+     * @param seatId the seat id of the seat that will be updated
+     * @param seat the seat with the data to update the given seat with id
+     * @return the updated seat
+     */
+    Seat updateSeat(Long seatId, Seat seat);
 }

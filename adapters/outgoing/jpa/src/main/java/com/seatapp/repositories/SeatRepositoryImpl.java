@@ -60,6 +60,17 @@ public class SeatRepositoryImpl implements SeatRepository {
         SeatEntity seat = repository.findById(seatId)
                 .orElseThrow(() ->
                         new EntityNotFoundException("no seat with this id."));
+
+        FloorEntity floorEntity = floorRepository.findAll()
+                .stream().filter(floorEntityFilter ->
+                        floorEntityFilter.getSeats()
+                                .contains(seat)).findFirst()
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "The seat does not exist in a floor"));
+
+        floorEntity.getSeats().remove(seat);
+        floorRepository.save(floorEntity);
+
         repository.delete(seat);
     }
 
