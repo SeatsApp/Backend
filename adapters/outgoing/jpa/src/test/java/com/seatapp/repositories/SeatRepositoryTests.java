@@ -1,9 +1,10 @@
 package com.seatapp.repositories;
 
-import com.seatapp.domain.Reservation;
-import com.seatapp.domain.Role;
+import com.seatapp.domain.Floor;
 import com.seatapp.domain.Seat;
+import com.seatapp.domain.Reservation;
 import com.seatapp.domain.User;
+import com.seatapp.domain.Role;
 import com.seatapp.exceptions.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,12 @@ class SeatRepositoryTests {
     @Autowired
     private SeatRepositoryImpl seatRepository;
 
+    /**
+     * The floor repository.
+     */
+    @Autowired
+    private FloorRepository floorRepository;
+
     @BeforeEach
     void setup() {
         seatRepository.deleteAll();
@@ -56,14 +63,16 @@ class SeatRepositoryTests {
     @Transactional
     void deleteSeat() {
         //Arrange
-        Seat savedSeat = seatRepository.save(VALID_SEAT);
+        Floor floor = floorRepository.save(new Floor(1L, "", new ArrayList<>(),
+                List.of(new Seat(
+                        "TestSeat", new ArrayList<>()))));
 
         //Act
-        seatRepository.deleteById(savedSeat.getId());
+        seatRepository.deleteById(floor.getSeats().get(0).getId());
 
         //Assert
         assertThrows(EntityNotFoundException.class,
-                () -> seatRepository.findById(savedSeat.getId()));
+                () -> seatRepository.findById(floor.getSeats().get(0).getId()));
     }
 
     @Test

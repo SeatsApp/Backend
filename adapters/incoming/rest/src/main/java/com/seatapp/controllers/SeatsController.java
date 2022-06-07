@@ -98,9 +98,28 @@ public class SeatsController {
     }
 
     /**
+     * Update the seat by the received seatDto.
+     *
+     * @param seatId  the id of the seat that has to be changed.
+     * @param seatDto the seat dto to update the seat.
+     * @return Returns a responseEntity with the HttpStatus.
+     */
+    @PatchMapping("{seatId}")
+    public ResponseEntity<String> updateSeat(
+            @PathVariable final Long seatId,
+            @RequestBody final SeatDto seatDto) {
+        seatService.updateSeat(seatId, new Seat(seatDto.getName(),
+                seatDto.getXCoordinates(),
+                seatDto.getYCoordinates(), seatDto.getWidth(),
+                seatDto.getHeight()));
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * Makes a seat unavailable for reservations.
+     *
      * @param seatId the id of the seat that has to be changed.
-     * @return Returns a responseEntity with the HttpStatus and a message.
+     * @return Returns a responseEntity with the HttpStatus.
      */
     @PatchMapping("{seatId}/availability")
     public ResponseEntity<String> changeAvailability(

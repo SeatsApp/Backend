@@ -380,4 +380,30 @@ class SeatServiceImplTest {
         //assert
         assertFalse(seat.isAvailable());
     }
+
+    @Test
+    void updateSeatTest() {
+        // Arrange
+        when(seatRepository.save(Mockito.any(Seat.class)))
+                .thenAnswer(i -> i.<Seat>getArgument(0));
+
+        when(seatRepository.findById(2L))
+                .thenReturn(new Seat(2L, "Test",
+                        true, 0, 0,
+                        0, 0, null));
+
+        Seat updateSeat = new Seat(2L, "New seat",
+                true, 1, 2,
+                2, 1, null);
+
+        //Act
+        Seat savedSeat = seatService.updateSeat(2L, updateSeat);
+
+        //Assert
+        assertEquals(updateSeat.getName(), savedSeat.getName());
+        assertEquals(updateSeat.getXCoordinates(), savedSeat.getXCoordinates());
+        assertEquals(updateSeat.getYCoordinates(), savedSeat.getYCoordinates());
+        assertEquals(updateSeat.getWidth(), savedSeat.getWidth());
+        assertEquals(updateSeat.getHeight(), savedSeat.getHeight());
+    }
 }

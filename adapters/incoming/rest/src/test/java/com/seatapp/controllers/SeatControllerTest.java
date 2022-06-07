@@ -561,4 +561,29 @@ class SeatControllerTest {
                         .header(authorizationString, bearerString + jwt))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void updateSeat() throws Exception {
+        // Arrange
+        SeatDto seatDto = new SeatDto(1L, "Test", null,
+                0, 0, 0, 0, 0, null, true);
+
+        when(seatService.updateSeat(eq(1L), any(Seat.class)))
+                .thenReturn(new Seat(1L, "Test", true,
+                        0, 0, 0, 0,
+                        new ArrayList<>()));
+
+        when(floorService.findById(0)).thenReturn(new Floor());
+
+        // Act & Assert
+        mockMvc.perform(patch("/api/seats/1")
+                        .with(authentication(authentication))
+                        .header(authorizationString,
+                                bearerString + jwt)
+                        .content(objectMapper
+                                .writeValueAsString(seatDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }
