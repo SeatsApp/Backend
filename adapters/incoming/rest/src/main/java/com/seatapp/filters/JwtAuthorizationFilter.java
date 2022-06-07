@@ -71,7 +71,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         if (!hasExcludedPath) {
             String jwt = jwtService.parseJwt(request);
             if (jwt == null || !jwtService.validateJwtToken(jwt)) {
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             } else {
                 String email = jwtService.getEmailFromJwtToken(jwt);

@@ -109,7 +109,7 @@ class LoginControllerTest {
         mockMvc
                 .perform(get("/api/healthcheck")
                         .header("authorization", "Bearer " + jwt))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -122,7 +122,7 @@ class LoginControllerTest {
         // Act
         mockMvc
                 .perform(get("/api/healthcheck"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

@@ -229,32 +229,8 @@ class SeatControllerTest {
     @Test
     void createSeatWithNoName() throws Exception {
         mockMvc.perform(post(apiSeatsUrl)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void createSeatWithEmptyStringAsName() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, "", null,
-                0, 0, 0, 0, 0, null, true);
-
-        mockMvc.perform(post(apiSeatsUrl)
-                        .content(objectMapper
-                                .writeValueAsString(seatDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void createSeatWithNameNull() throws Exception {
-        SeatDto seatDto = new SeatDto(1L, null, null,
-                0, 0, 0, 0, 0, null, true);
-
-        mockMvc.perform(post(apiSeatsUrl)
-                        .content(objectMapper
-                                .writeValueAsString(seatDto))
+                        .header(authorizationString,
+                                bearerString + jwt)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -263,6 +239,8 @@ class SeatControllerTest {
     @Test
     void createSeatWithDtoBeingNull() throws Exception {
         mockMvc.perform(post(apiSeatsUrl)
+                        .header(authorizationString,
+                                bearerString + jwt)
                         .content(objectMapper.writeValueAsString(null))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
