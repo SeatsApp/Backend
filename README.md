@@ -12,8 +12,31 @@ check in at his seat so that the system knows that he is actually present.
 ### Api actions
 
 <ul>
-<li>Create: You can create a seat with a certain name.</li>
-<li>Delete: You can delete a seat.</li>
+<li>Seats:
+    <ul>
+        <li>Read:
+            <ul>
+                <li>You can retrieve all the seats. You can also add the parameter date to receive the seat status for the given date.</li>
+                <li>The seats from a building and floor. You can also add the parameter date to receive the seat status for the given date.</li>
+            </ul>
+        </li>
+        <li>Create: You can create a seat with a certain name and the coordinates on a floor.</li>
+        <li>Update: A seat can be updated.</li>
+        <li>Delete: You can delete a seat.</li>
+    </ul>
+</li>
+<li>Buildings:
+    <ul>
+        <li>Read:
+            <ul>
+                <li>You can retrieve all the buildings with the floors.</li>
+                <li>You can retrieve a building by a specific id.</li>
+            </ul>
+        </li>
+        <li>Create: You can create a building with floor.</li>
+        <li>Update: You can update the building. Updating the building will also update the floors with the given information about the floors.</li>
+    </ul>
+</li>
 <li>Reserve: You can reserve a seat from an hour to another.</li>
     The necessary checks are present so that you cannot reserve a seat that is already
     reserved between the chosen hours. You also can't reserve a seat that is unavailable 
@@ -74,6 +97,16 @@ changes.
 In case you want to run the application on android you have to use ngrok, android doesn't just work
 with `http://localhost` only with `http://10.0.2.2` so we used ngrok to convert the redirect link to a https link.
 Because `https://` is allowed by azure portal it will redirect you to the right location.
+
+### Timezone
+
+We have changed the timezone in the application module in the SeatAppApplication. This was required for the deployment
+to a AWS server in Ireland. We set the timezone to CET.
+
+### Static initialise in database
+
+For testing purposes we added a building with floors, seats and more. You can find this
+in `adapters/outgoing/jpa/src/main/com.seatapp/repositories/BuildingRepositoryImpl.java`.
 
 ## Deploy
 
